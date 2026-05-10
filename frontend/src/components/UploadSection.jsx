@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3 } from 'lucide-react';
+import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3, Eye, EyeOff } from 'lucide-react';
 
 const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [jdText, setJdText] = useState('');
@@ -8,6 +8,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [jdFocused, setJdFocused] = useState(false);
   const [displayPct, setDisplayPct] = useState(0);
   const [apiKey, setApiKey] = useState('');
+  const [showKey, setShowKey] = useState(false);
   const fileRef = useRef();
 
   const isWarmingUp = !progress;
@@ -173,14 +174,23 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               Gemini API Key (Optional)
               <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--ink-4)' }}>Overrides server default if provided</span>
             </p>
-            <input 
-              type="password" 
-              placeholder="Enter your key..." 
-              value={apiKey} 
-              onChange={(e) => setApiKey(e.target.value)} 
-              className="text-input" 
-              style={{ padding: '8px 0', border: 'none', borderBottom: '1px solid var(--sand-200)', borderRadius: 0, height: 'auto', fontSize: '.9rem' }} 
-            />
+            <div style={{ position: 'relative' }}>
+              <input 
+                type={showKey ? "text" : "password"} 
+                placeholder="Enter your key..." 
+                value={apiKey} 
+                onChange={(e) => setApiKey(e.target.value)} 
+                className="text-input" 
+                style={{ width: '100%', padding: '8px 32px 8px 0', border: 'none', borderBottom: '1px solid var(--sand-200)', borderRadius: 0, height: 'auto', fontSize: '.9rem' }} 
+              />
+              <button 
+                type="button"
+                onClick={() => setShowKey(!showKey)} 
+                style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--ink-4)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
+              >
+                {showKey ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+              </button>
+            </div>
           </div>
         </div>
 
