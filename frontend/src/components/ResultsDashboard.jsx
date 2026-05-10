@@ -215,7 +215,7 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '50px' }}>
         <div>
           <h2 style={{ fontSize: '3.5rem', fontWeight: 900, letterSpacing: '-0.05em', textTransform: 'uppercase', lineHeight: 0.9 }}>
-            Candidate<br /><span style={{ color: var(--accent) }}>Intelligence</span>
+            Candidate<br /><span style={{ color: 'var(--accent-neon)' }}>Intelligence</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginTop: '16px', fontWeight: 500 }}>
             {candidates.length} Profiles analyzed via Neural Shortlisting Agent.
