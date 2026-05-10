@@ -6,8 +6,10 @@ function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [view, setView] = useState('dashboard'); // 'dashboard' or 'results'
+  
   // Real-time progress from backend stream
-  const [progress, setProgress] = useState(null); // {current, total, filename, step}
+  const [progress, setProgress] = useState(null);
   const [completedFiles, setCompletedFiles] = useState([]);
 
   const handleEvaluate = async (jdText, resumes) => {
@@ -28,11 +30,8 @@ function App() {
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
 
-      // Read the NDJSON stream line-by-line
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
@@ -52,23 +51,19 @@ function App() {
             const event = JSON.parse(line);
             if (event.type === 'progress') {
               setProgress({ current: event.current, total: event.total, filename: event.filename, step: event.step });
-              if (event.step === 'done') {
-                setCompletedFiles(prev => [...prev, event.filename]);
-              }
+              if (event.step === 'done') setCompletedFiles(prev => [...prev, event.filename]);
             } else if (event.type === 'result') {
               finalResults = event.shortlist;
             }
-          } catch (e) {
-            // skip malformed lines
-          }
+          } catch (e) {}
         }
       }
 
-      // Show "All done" state briefly before transitioning to results
       if (finalResults) {
         setProgress(prev => prev ? { ...prev, step: 'all_done' } : prev);
         await new Promise(r => setTimeout(r, 1200));
         setResults(finalResults);
+        setView('results');
       }
     } catch (err) {
       console.error(err);
@@ -84,6 +79,7 @@ function App() {
     setError(null);
     setProgress(null);
     setCompletedFiles([]);
+    setView('dashboard');
   };
 
   return (
@@ -99,11 +95,18 @@ function App() {
           </div>
           
           <nav className="sidebar-nav">
-            <div className={`nav-item ${!results ? 'active' : ''}`} onClick={handleReset}>
+            <div 
+              className={`nav-item ${view === 'dashboard' ? 'active' : ''}`} 
+              onClick={() => setView('dashboard')}
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
               <span>Dashboard</span>
             </div>
-            <div className={`nav-item ${results ? 'active' : ''}`} style={{ opacity: results ? 1 : 0.5, cursor: results ? 'pointer' : 'default' }}>
+            <div 
+              className={`nav-item ${view === 'results' ? 'active' : ''}`} 
+              onClick={() => results && setView('results')}
+              style={{ opacity: results ? 1 : 0.4, cursor: results ? 'pointer' : 'not-allowed' }}
+            >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
               <span>Evaluations</span>
             </div>
@@ -125,7 +128,7 @@ function App() {
             <div className="topbar-breadcrumb">
               <span>Platform</span>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-              <span>{results ? 'Evaluations' : 'New Evaluation'}</span>
+              <span>{view === 'results' ? 'Evaluations' : 'New Evaluation'}</span>
             </div>
             <div className="topbar-actions">
               <div className="topbar-badge">AI-Powered Intelligence</div>
@@ -140,7 +143,7 @@ function App() {
               </div>
             )}
 
-            {!results ? (
+            {view === 'dashboard' ? (
               <UploadSection
                 onEvaluate={handleEvaluate}
                 isLoading={isLoading}
