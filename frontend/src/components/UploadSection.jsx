@@ -6,14 +6,27 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [jdFocused, setJdFocused] = useState(false);
-  const [simulatedPct, setSimulatedPct] = useState(0);
+  const [displayPct, setDisplayPct] = useState(0);
   const fileRef = useRef();
 
+  const isWarmingUp = !progress;
+  const current = progress?.current || 0;
+  const total = progress?.total || (resumes?.length ?? 1);
+  const basePct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
+
+  // Sync displayPct if basePct jumps higher (e.g. new file finishes)
+  useEffect(() => {
+    if (isLoading) {
+      setDisplayPct(prev => Math.max(prev, basePct));
+    }
+  }, [basePct, isLoading]);
+
+  // Tick the displayPct upwards slowly
   useEffect(() => {
     let interval;
     if (isLoading) {
       interval = setInterval(() => {
-        setSimulatedPct(prev => {
+        setDisplayPct(prev => {
           if (prev >= 99) return 99;
           const chance = prev > 80 ? 0.2 : prev > 50 ? 0.5 : 0.9;
           if (Math.random() < chance) return prev + 1;
@@ -21,7 +34,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         });
       }, 400);
     } else {
-      setSimulatedPct(0);
+      setDisplayPct(0);
     }
     return () => clearInterval(interval);
   }, [isLoading]);
@@ -30,13 +43,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
 
   /* Loading screen */
   if (isLoading) {
-    const isWarmingUp = !progress;
-    const current = progress?.current || 0;
-    const total = progress?.total || (resumes?.length ?? 1);
-    const basePct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
-    const displayPct = Math.max(basePct, simulatedPct);
     const filename = progress?.filename || 'Initializing AI model...';
-    const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
     
     return (
       <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
