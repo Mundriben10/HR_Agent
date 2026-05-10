@@ -20,44 +20,24 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
     
     return (
-      <div className="fade-up" style={{ maxWidth: 560, margin: '80px auto', textAlign: 'center' }}>
-        <div style={{
-          width: 56, height: 56, borderRadius: '50%', margin: '0 auto 24px',
-          background: 'var(--violet-bg)', border: '1px solid rgba(74,158,114,.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--violet)'
-        }}>
-          <Cpu size={28} strokeWidth={1.5} className={isWarmingUp ? 'pulse-ring' : ''} />
-        </div>
-        <h2 className="serif-heading" style={{ fontSize: '2rem', marginBottom: 12 }}>Analyzing Talent</h2>
-        <p style={{ color: 'var(--ink-3)', fontSize: '1.05rem', marginBottom: 40, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>{statusText}</p>
+      <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div className="spinner" style={{ width: 28, height: 28, borderWidth: 2, borderTopColor: 'var(--ink-3)', borderRightColor: 'var(--ink-3)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', marginBottom: 24, animationDuration: '1s' }} />
+        <h2 className="serif-heading" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 12 }}>Analyzing Talent</h2>
         
-        <div style={{ padding: 32, textAlign: 'left', border: '1px solid var(--sand-200)', borderRadius: '16px', background: '#fff', boxShadow: 'var(--shadow-1)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, alignItems: 'flex-end' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
-                {isWarmingUp ? 'Starting' : `Evaluating ${current} of ${total}`}
-              </span>
-              <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {filename}
-              </span>
-            </div>
-            <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--violet)', fontVariantNumeric: 'tabular-nums' }}>
-              {isWarmingUp ? <span className="spinner" style={{ width:14, height:14, borderWidth:2, display:'inline-block', verticalAlign:'middle' }}/> : `${Math.round(pct)}%`}
-            </span>
-          </div>
-          <div className="progress-bar" style={{ marginBottom: 24, height: 8, background: 'var(--sand-200)', overflow: 'hidden' }}>
-            <div className="progress-fill" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet), var(--emerald))', transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-              <div className="progress-shimmer" />
-            </div>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-start' }}>
+        <div style={{ color: 'var(--ink-4)', fontSize: '.95rem', marginBottom: 32, fontFamily: 'Georgia, serif', fontStyle: 'italic', letterSpacing: '0.01em' }}>
+          {isWarmingUp ? 'Connecting to secure AI environment...' : `Evaluating ${current} of ${total}: ${filename}`}
+        </div>
+
+        {completedFiles.length > 0 && (
+          <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 360 }}>
             {completedFiles.map((n, i) => (
-              <span key={i} className="fade-up" style={{ padding: '5px 12px', borderRadius: 20, background: 'var(--emerald-bg)', color: 'var(--emerald)', fontSize: '.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(16,185,129,.2)' }}>
-                <CheckCircle size={14} strokeWidth={2} /> {n}
-              </span>
+              <div key={i} className="fade-up" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'transparent', border: '1px solid var(--sand-200)', borderRadius: '8px' }}>
+                <CheckCircle size={14} color="var(--violet)" strokeWidth={2} />
+                <span style={{ fontSize: '.85rem', color: 'var(--ink-2)' }}>{n} evaluated</span>
+              </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
     );
   }

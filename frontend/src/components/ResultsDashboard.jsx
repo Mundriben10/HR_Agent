@@ -121,7 +121,14 @@ const Modal = ({ candidate, onClose, onSave }) => {
         <div style={{ display:'flex', flex:1, overflow:'hidden', background: '#fff' }}>
           {/* Rubric list */}
           <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:16 }}>
-            <p className="label">Scoring Dimensions</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <p className="label">Scoring Dimensions</p>
+              <div style={{ display: 'flex', gap: 16, fontSize: '.75rem', color: 'var(--ink-4)' }}>
+                <span><strong style={{color:'var(--rose)'}}>0</strong> – Poor</span>
+                <span><strong style={{color:'var(--amber)'}}>5</strong> – Avg</span>
+                <span><strong style={{color:'var(--emerald)'}}>10</strong> – Excel</span>
+              </div>
+            </div>
             {Object.entries(DIM).map(([k,m]) => {
               const orig = candidate[k] || {};
               const changed = edits[k] !== (orig.score||0);
@@ -226,9 +233,14 @@ const ResultsDashboard = ({ results: init, onReset }) => {
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:28, paddingBottom: 24, borderBottom: '1px solid var(--sand-200)' }}>
         <div>
           <h1 className="serif-heading" style={{ fontSize:'2.25rem', fontWeight:400, marginBottom:8 }}>Evaluation Results</h1>
-          <p style={{ color:'var(--ink-4)', fontSize:'1.05rem', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+          <p style={{ color:'var(--ink-4)', fontSize:'1.05rem', fontFamily: 'Georgia, serif', fontStyle: 'italic', marginBottom: 16 }}>
             AI analyzed {candidates.length} profiles. Shortlist generated based on highest match scores.
           </p>
+          <div style={{ display: 'flex', gap: 24, fontSize: '.85rem', color: 'var(--ink-3)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--rose)' }}/> <strong>0</strong> – Poor</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--amber)' }}/> <strong>5</strong> – Average</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--emerald)' }}/> <strong>10</strong> – Excellent</span>
+          </div>
         </div>
         <div style={{ display:'flex', gap:12 }}>
           <button className="btn btn-ghost" onClick={onReset} style={{ borderRadius: '50px', padding: '10px 20px' }}>
