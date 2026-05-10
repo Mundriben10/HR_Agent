@@ -15,7 +15,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     const isWarmingUp = !progress;
     const current = progress?.current || 0;
     const total = progress?.total || (resumes?.length ?? 1);
-    const pct = isWarmingUp ? 5 : (current / total) * 100;
+    const pct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
     const filename = progress?.filename || 'Initializing AI model...';
     const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
     
