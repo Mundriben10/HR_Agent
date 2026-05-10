@@ -4,6 +4,8 @@ from fastapi.responses import StreamingResponse
 from typing import List
 import os
 import uvicorn
+from dotenv import load_dotenv
+load_dotenv()
 from datetime import datetime
 import json
 

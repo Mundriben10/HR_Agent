@@ -34,6 +34,9 @@ function App() {
           try {
             const ev = JSON.parse(line);
             console.log('AI Event:', ev);
+            if (ev.error) {
+              throw new Error(ev.error);
+            }
             if (ev.type === 'progress') {
               setProgress({ current: ev.current, total: ev.total, filename: ev.filename, step: ev.step });
               if (ev.step === 'done') setCompletedFiles(p => [...p, ev.filename]);
@@ -42,7 +45,8 @@ function App() {
               finalResults = ev.shortlist;
             }
           } catch (e) {
-            console.error('Failed to parse line:', line, e);
+            console.error('Failed to parse line or caught error:', e);
+            throw e; // rethrow to be caught by the outer catch
           }
         }
       }
@@ -51,9 +55,11 @@ function App() {
         try {
           const ev = JSON.parse(buffer);
           console.log('Final AI Event (from buffer):', ev);
+          if (ev.error) throw new Error(ev.error);
           if (ev.type === 'result') finalResults = ev.shortlist;
         } catch (e) {
-          console.error('Failed to parse final buffer:', buffer, e);
+          console.error('Failed to parse final buffer or caught error:', e);
+          throw e;
         }
       }
 
