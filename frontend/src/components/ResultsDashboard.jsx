@@ -98,22 +98,22 @@ const Modal = ({ candidate, onClose, onSave }) => {
     <div className="modal-backdrop">
       <div className="modal fade-up">
         {/* Header */}
-        <div style={{ padding:'20px 28px', borderBottom:'1px solid var(--sand-200)', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ width:42, height:42, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'1rem' }}>
+        <div style={{ padding:'24px 32px', borderBottom:'1px solid var(--sand-200)', display:'flex', justifyContent:'space-between', alignItems:'center', background: '#F9F8F6' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            <div style={{ width:48, height:48, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontSize:'1.25rem', fontFamily: 'Georgia, serif' }}>
               {(candidate.candidate_name||'?')[0].toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight:700, fontSize:'1rem' }}>{candidate.candidate_name}</div>
-              <div style={{ display:'flex', gap:6, marginTop:2 }}>
+              <h2 className="serif-heading" style={{ fontSize:'1.5rem', fontWeight:400, marginBottom: 4 }}>{candidate.candidate_name}</h2>
+              <div style={{ display:'flex', gap:6 }}>
                 <span className={`tag tag-${rc(candidate.recommendation)}`}>{candidate.recommendation}</span>
                 {candidate.is_overridden && <span className="tag tag-override">Modified</span>}
               </div>
             </div>
           </div>
-          <div style={{ display:'flex', gap:10 }}>
-            <button className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
-            <button className="btn btn-primary btn-sm" onClick={save}>Save Changes</button>
+          <div style={{ display:'flex', gap:12 }}>
+            <button className="btn btn-ghost" onClick={onClose} style={{ borderRadius: '50px' }}>Cancel</button>
+            <button className="btn btn-primary" onClick={save} style={{ borderRadius: '50px' }}>Save Changes</button>
           </div>
         </div>
 
@@ -158,8 +158,8 @@ const Modal = ({ candidate, onClose, onSave }) => {
                     <div style={{ height:'100%', width:`${edits[k]*10}%`, background:color, borderRadius:100, transition:'width .3s, background .3s' }} />
                   </div>
                   {orig.justification && (
-                    <p style={{ fontSize:'.78rem', color:'var(--ink-3)', lineHeight:1.55, paddingLeft:10, borderLeft:'2px solid var(--sand-200)' }}>
-                      {orig.justification}
+                    <p style={{ fontSize:'.85rem', color:'var(--ink-3)', lineHeight:1.6, paddingLeft:12, borderLeft:'2px solid var(--violet)', fontFamily: 'Georgia, serif', fontStyle: 'italic', background: 'var(--violet-bg)', padding: '10px 14px', borderRadius: '0 8px 8px 0' }}>
+                      "{orig.justification}"
                     </p>
                   )}
                 </div>
@@ -223,14 +223,21 @@ const ResultsDashboard = ({ results: init, onReset }) => {
   return (
     <div style={{ maxWidth:1100, margin:'0 auto' }}>
       {/* Header row */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:28 }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:28, paddingBottom: 24, borderBottom: '1px solid var(--sand-200)' }}>
         <div>
-          <p className="label" style={{ marginBottom:6 }}>Evaluation Complete</p>
-          <h1 style={{ fontSize:'2rem', fontWeight:900, letterSpacing:'-.03em' }}>Candidate Shortlist</h1>
+          <h1 className="serif-heading" style={{ fontSize:'2.25rem', fontWeight:400, marginBottom:8 }}>Evaluation Results</h1>
+          <p style={{ color:'var(--ink-4)', fontSize:'1.05rem', fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+            AI analyzed {candidates.length} profiles. Shortlist generated based on highest match scores.
+          </p>
         </div>
-        <button className="btn btn-ghost btn-sm" onClick={onReset}>
-          <RotateCcw size={14} strokeWidth={1.5} /> New Evaluation
-        </button>
+        <div style={{ display:'flex', gap:12 }}>
+          <button className="btn btn-ghost" onClick={onReset} style={{ borderRadius: '50px', padding: '10px 20px' }}>
+            <RotateCcw size={16} /> Start Over
+          </button>
+          <button className="btn btn-primary" style={{ borderRadius: '50px', padding: '10px 24px' }}>
+            Export Shortlist
+          </button>
+        </div>
       </div>
 
       {/* Stat strip */}
@@ -253,7 +260,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
 
       {/* TOP CANDIDATE — big feature card */}
       {top && (
-        <div className="candidate-card fade-up" style={{ marginBottom:20, flexDirection:'row', alignItems:'center', gap:28, padding:'28px 32px', borderColor: 'var(--violet)', boxShadow: '0 0 0 1px rgba(74,158,114,.15), var(--shadow-2)' }} onClick={()=>setSelected(top)}>
+        <div className="candidate-card fade-up" style={{ marginBottom:32, flexDirection:'row', alignItems:'center', gap:32, padding:'32px 40px', border: '1px solid var(--violet)', boxShadow: '0 4px 24px rgba(74,158,114,.08)', borderRadius: '16px', background: '#fff' }} onClick={()=>setSelected(top)}>
           <div style={{ position:'relative', flexShrink:0 }}>
             <Ring score={top.total_score||0} size={110} />
             <div style={{ position:'absolute', top:-6, left:-6, background:'#fbbf24', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', color: '#b45309', boxShadow:'0 2px 8px rgba(0,0,0,.2)' }}>
@@ -262,14 +269,24 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
-              <h2 style={{ fontSize:'1.5rem', fontWeight:800, letterSpacing:'-.025em', color:'var(--ink-2)' }}>{top.candidate_name}</h2>
+              <h2 className="serif-heading" style={{ fontSize:'1.75rem', fontWeight:400, color:'var(--ink)' }}>{top.candidate_name}</h2>
               <span className={`tag tag-${rc(top.recommendation)}`}>{top.recommendation}</span>
               {top.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
             </div>
-            <p style={{ fontSize:'.85rem', color:'var(--ink-3)', marginBottom:16 }}>Ranked #1 out of {candidates.length} candidates · Highest match score</p>
+            <p style={{ fontSize:'.9rem', color:'var(--ink-3)', marginBottom:16, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>Ranked #1 out of {candidates.length} candidates · Highest match score</p>
+            
+            {/* Justification highlight if available */}
+            {top.skills_match?.justification && (
+              <div style={{ marginBottom: 20, padding: '12px 16px', background: 'var(--sand-50)', borderRadius: '8px', borderLeft: '2px solid var(--violet)' }}>
+                <p style={{ fontSize: '.9rem', color: 'var(--ink-3)', fontFamily: 'Georgia, serif', fontStyle: 'italic', lineHeight: 1.5 }}>
+                  "{top.skills_match.justification}"
+                </p>
+              </div>
+            )}
+
             <DimBars candidate={top} />
           </div>
-          <button className="btn btn-ghost" style={{ flexShrink:0, gap: '8px' }}>
+          <button className="btn btn-ghost" style={{ flexShrink:0, gap: '8px', borderRadius: '50px' }}>
             Inspect Profile <Search size={16} strokeWidth={1.5} />
           </button>
         </div>
@@ -285,31 +302,46 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           const medalIconColor = i === 1 ? '#1d4ed8' : i === 2 ? '#be185d' : 'var(--ink-4)';
           
           return (
-            <div key={i} className="candidate-card" onClick={()=>setSelected(c)}>
+            <div key={i} className="candidate-card fade-up" onClick={()=>setSelected(c)} style={{ padding: '24px', border: '1px solid var(--sand-200)', borderRadius: '16px', background: '#fff', display: 'flex', flexDirection: 'column' }}>
               {/* Card header */}
-              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <div style={{ width:42, height:42, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, fontSize:'1rem', flexShrink:0 }}>
-                  {(c.candidate_name||'?')[0].toUpperCase()}
+              <div style={{ display:'flex', alignItems:'flex-start', justifyContent: 'space-between', gap:12, marginBottom:16 }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                  <div style={{ width:42, height:42, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontFamily: 'Georgia, serif', fontSize:'1.25rem', flexShrink:0 }}>
+                    {(c.candidate_name||'?')[0].toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="serif-heading" style={{ fontSize:'1.25rem', fontWeight:400, color:'var(--ink)' }}>{c.candidate_name}</h3>
+                    <div style={{ display:'flex', gap:6, marginTop:4 }}>
+                      <span className={`tag tag-${rc(c.recommendation)}`}>{c.recommendation}</span>
+                      {c.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
+                    </div>
+                  </div>
                 </div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontWeight:700, fontSize:'.9rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{c.candidate_name}</div>
-                  <span className={`tag tag-${rc(c.recommendation)}`} style={{ marginTop:2 }}>{c.recommendation}</span>
-                </div>
-                <div className="medal" style={{ background: medalColor, color: medalIconColor }}>
-                  {i < 3 ? <Medal size={14} strokeWidth={2} /> : i + 1}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                  <div className="score-ring" style={{ width:40, height:40, background:`conic-gradient(${sc(score)} ${score*10}%, var(--sand-100) 0)` }}>
+                    <div className="score-ring-inner" style={{ width:32, height:32, background: '#fff' }}>
+                      <span style={{ fontSize:'.85rem', fontWeight:800, color:sc(score) }}>{score.toFixed(1)}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Score */}
-              <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-                <Ring score={score} size={70} />
-                <div style={{ flex:1 }}>
-                  <DimBars candidate={c} />
+              {/* Justification highlight if available */}
+              {c.skills_match?.justification && (
+                <div style={{ marginBottom: 16, padding: '12px 16px', background: 'var(--sand-50)', borderRadius: '8px', borderLeft: '2px solid var(--violet)' }}>
+                  <p style={{ fontSize: '.85rem', color: 'var(--ink-3)', fontFamily: 'Georgia, serif', fontStyle: 'italic', lineHeight: 1.5 }}>
+                    "{c.skills_match.justification}"
+                  </p>
                 </div>
+              )}
+
+              {/* Score */}
+              <div style={{ flex: 1 }}>
+                <DimBars candidate={c} />
               </div>
 
               {/* Footer */}
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:4, borderTop:'1px solid var(--sand-100)' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:16, marginTop: 16, borderTop:'1px solid var(--sand-100)' }}>
                 {c.is_overridden && <span className="tag tag-override">Edited</span>}
                 <span style={{ marginLeft:'auto', fontSize:'.78rem', fontWeight:600, color: 'var(--violet)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   Details <Search size={12} strokeWidth={2} />

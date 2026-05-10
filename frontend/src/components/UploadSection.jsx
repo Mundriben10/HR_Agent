@@ -20,21 +20,18 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
     
     return (
-      <div className="fade-up" style={{ maxWidth: 560, margin: '60px auto', textAlign: 'center' }}>
-        <div className="pulse-container" style={{
-          width: 72, height: 72, borderRadius: 20, margin: '0 auto 24px',
-          background: 'linear-gradient(135deg,#4a9e72,#2d7a52)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(74,158,114,.35)', color: '#fff',
-          position: 'relative'
+      <div className="fade-up" style={{ maxWidth: 560, margin: '80px auto', textAlign: 'center' }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: '50%', margin: '0 auto 24px',
+          background: 'var(--violet-bg)', border: '1px solid rgba(74,158,114,.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--violet)'
         }}>
-          <div className="pulse-ring" />
-          <Cpu size={32} strokeWidth={1.5} style={{ animation: 'bounce-subtle 2s infinite ease-in-out' }} />
+          <Cpu size={28} strokeWidth={1.5} className={isWarmingUp ? 'pulse-ring' : ''} />
         </div>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 8 }}>Analyzing Talent</h2>
-        <p style={{ color: 'var(--ink-3)', fontSize: '.9rem', marginBottom: 32 }}>{statusText}</p>
+        <h2 className="serif-heading" style={{ fontSize: '2rem', marginBottom: 12 }}>Analyzing Talent</h2>
+        <p style={{ color: 'var(--ink-3)', fontSize: '1.05rem', marginBottom: 40, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>{statusText}</p>
         
-        <div className="card" style={{ padding: 28, textAlign: 'left' }}>
+        <div style={{ padding: 32, textAlign: 'left', border: '1px solid var(--sand-200)', borderRadius: '16px', background: '#fff', boxShadow: 'var(--shadow-1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, alignItems: 'flex-end' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
@@ -69,31 +66,31 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
       {/* ── Hero ── */}
       <div className="fade-up" style={{ marginBottom: 32 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: 'var(--violet-bg)', marginBottom: 16 }}>
-          <ShieldCheck size={14} color="var(--violet)" strokeWidth={2} />
-          <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--violet)', letterSpacing: '.04em' }}>ENTERPRISE AI ANALYSIS</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, border: '1px solid var(--sand-200)', marginBottom: 24, background: '#fff' }}>
+          <ShieldCheck size={14} color="var(--violet)" strokeWidth={1.5} />
+          <span style={{ fontSize: '.75rem', fontWeight: 500, color: 'var(--ink-2)', letterSpacing: '.04em' }}>ENTERPRISE AI ANALYSIS</span>
         </div>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-.04em', lineHeight: 1.05, marginBottom: 12 }}>
-          Find your next<br /><span style={{ color: 'var(--violet)' }}>top candidate.</span>
+        <h1 className="serif-heading" style={{ fontSize: '3rem', lineHeight: 1.1, marginBottom: 16 }}>
+          Find your next <span style={{ color: 'var(--violet)' }}>top candidate.</span>
         </h1>
-        <p style={{ fontSize: '.95rem', color: 'var(--ink-3)', maxWidth: 500, lineHeight: 1.65 }}>
-          Paste a job description, upload resumes, and receive a ranked shortlist with transparent AI scoring in seconds.
+        <p style={{ fontSize: '1.05rem', color: 'var(--ink-3)', maxWidth: 500, lineHeight: 1.65, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+          Paste a job description, upload resumes, and receive a ranked shortlist with transparent AI scoring.
         </p>
       </div>
 
       {/* ── Bento Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
 
         {/* JD Card */}
-        <div className={`card ${jdFocused ? 'card-focus' : ''}`} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14, gridRow: 'span 2' }}>
+        <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 16, gridRow: 'span 2', background: '#fff', border: `1px solid ${jdFocused ? 'var(--violet)' : 'var(--sand-200)'}`, borderRadius: '16px', transition: 'border-color 0.2s' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--violet-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--violet)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--sand-50)', border: '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-2)' }}>
                 <FileText size={18} strokeWidth={1.5} />
               </div>
-              <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Job Description</span>
+              <h3 className="serif-heading" style={{ fontSize: '1.25rem' }}>Job Description</h3>
             </div>
-            <span className="label">{jdText.trim().split(/\s+/).filter(Boolean).length || 0} words</span>
+            <span className="label" style={{ fontWeight: 500 }}>{jdText.trim().split(/\s+/).filter(Boolean).length || 0} words</span>
           </div>
           <textarea
             className="input-field"
@@ -101,19 +98,19 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
             onChange={e => setJdText(e.target.value)}
             onFocus={() => setJdFocused(true)}
             onBlur={() => setJdFocused(false)}
-            placeholder="Paste job description here..."
+            placeholder="Paste the job description here to set the baseline..."
             rows={16}
-            style={{ flex: 1 }}
+            style={{ flex: 1, border: 'none', background: 'transparent', padding: 0, boxShadow: 'none', fontSize: '1rem', lineHeight: 1.6 }}
           />
         </div>
 
         {/* Upload Zone Card */}
-        <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 16, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--amber)' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--sand-50)', border: '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-2)' }}>
               <Upload size={18} strokeWidth={1.5} />
             </div>
-            <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Candidate Resumes</span>
+            <h3 className="serif-heading" style={{ fontSize: '1.25rem' }}>Candidate Resumes</h3>
           </div>
 
           <div
@@ -143,15 +140,15 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         </div>
 
         {/* Feature tiles row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
           {[
-            { icon: <BarChart3 size={20} strokeWidth={1.5} />, label: 'Neural Scoring', desc: 'Skills, experience, education, portfolio, communication' },
-            { icon: <Zap size={20} strokeWidth={1.5} />, label: 'Real-time Analysis', desc: 'Results stream in as each resume is evaluated' },
+            { icon: <BarChart3 size={20} strokeWidth={1.5} />, label: 'Neural Scoring', desc: 'Evaluates across 5 distinct dimensions.' },
+            { icon: <Zap size={20} strokeWidth={1.5} />, label: 'Real-time Analysis', desc: 'Streaming results with justifications.' },
           ].map((f, i) => (
-            <div key={i} className="card" style={{ padding: '14px 16px' }}>
-              <div style={{ color: 'var(--violet)', marginBottom: 6 }}>{f.icon}</div>
-              <div style={{ fontWeight: 700, fontSize: '.82rem', marginBottom: 3 }}>{f.label}</div>
-              <div style={{ fontSize: '.75rem', color: 'var(--ink-4)', lineHeight: 1.4 }}>{f.desc}</div>
+            <div key={i} style={{ padding: 24, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px' }}>
+              <div style={{ color: 'var(--ink-4)', marginBottom: 12 }}>{f.icon}</div>
+              <h4 className="serif-heading" style={{ fontSize: '1.1rem', marginBottom: 4 }}>{f.label}</h4>
+              <div style={{ fontSize: '.85rem', color: 'var(--ink-4)', lineHeight: 1.5 }}>{f.desc}</div>
             </div>
           ))}
         </div>
@@ -161,9 +158,9 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           className="btn btn-primary"
           onClick={() => onEvaluate(jdText, resumes)}
           disabled={!jdText.trim() || !resumes || isLoading}
-          style={{ padding: '16px 28px', fontSize: '1rem', fontWeight: 700, borderRadius: 14, height: 56 }}
+          style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '50px', height: 56, marginTop: 8 }}
         >
-          {isLoading ? <><div className="spinner" />Evaluating...</> : <><Rocket size={18} strokeWidth={1.5} /> Start Evaluation Loop</>}
+          {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
         </button>
       </div>
     </div>

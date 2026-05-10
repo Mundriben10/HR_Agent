@@ -1,38 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 :root {
-  --sand-50: #f8fafc;
-  --sand-100: #f1f5f9;
-  --sand-200: #e2e8f0;
-  --sand-300: #cbd5e1;
-  --ink: #0f172a;
-  --ink-2: #1e293b;
-  --ink-3: #334155;
-  --ink-4: #64748b;
+  /* ── Claude-like Warm Neutrals ── */
+  --sand-50: #F9F8F6;
+  --sand-100: #EFECE6;
+  --sand-200: #E1DDD4;
+  --sand-300: #C9C3B8;
+  --ink: #111111;
+  --ink-2: #333333;
+  --ink-3: #555555;
+  --ink-4: #888888;
   /* ── Brand: Sage Green ── */
   --violet: #4a9e72;
   --violet-2: #5fb88a;
   --violet-bg: #eaf5ef;
-  --sidebar-bg: #0f172a;
+  --sidebar-bg: #F9F8F6;
   /* ── Semantic ── */
   --emerald: #10b981;
   --emerald-bg: #ecfdf5;
-  --amber: #f59e0b;
+  --amber: #d97706;
   --amber-bg: #fffbeb;
-  --rose: #f43f5e;
+  --rose: #e11d48;
   --rose-bg: #fff1f2;
-  --sidebar-w: 60px;
-  --topbar-h: 56px;
-  --radius: 16px;
-  --radius-sm: 10px;
-  --shadow-1: 0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
-  --shadow-2: 0 4px 12px rgba(15,23,42,.08),0 2px 4px rgba(15,23,42,.04);
-  --shadow-3: 0 12px 32px rgba(15,23,42,.10),0 4px 8px rgba(15,23,42,.06);
+  --sidebar-w: 64px;
+  --topbar-h: 60px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-1: 0 2px 8px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.02);
+  --shadow-2: 0 8px 24px rgba(0,0,0,.06), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-3: 0 16px 48px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body,#root{height:100%;}
-body{font-family:'Inter',sans-serif;background:var(--sand-50);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden;line-height:1.5;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--sand-50);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden;line-height:1.6;}
+h1, h2, h3, .serif-heading { font-family: "Georgia", "Times New Roman", serif; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
 
 /* ── APP SHELL ── */
 .app-shell{display:flex;height:100vh;width:100vw;overflow:hidden;}
