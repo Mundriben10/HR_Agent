@@ -1,3 +1,4 @@
+import React, { useState, useRef } from 'react';
 import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {

@@ -26,22 +26,32 @@ function App() {
         const { done, value } = await reader.read();
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n'); buffer = lines.pop();
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
         for (const line of lines) {
           if (!line.trim()) continue;
           try {
             const ev = JSON.parse(line);
+            console.log('AI Event:', ev);
             if (ev.type === 'progress') {
               setProgress({ current: ev.current, total: ev.total, filename: ev.filename, step: ev.step });
               if (ev.step === 'done') setCompletedFiles(p => [...p, ev.filename]);
-            } else if (ev.type === 'result') finalResults = ev.shortlist;
-          } catch {}
+            } else if (ev.type === 'result') {
+              console.log('Final Results Received:', ev.shortlist);
+              finalResults = ev.shortlist;
+            }
+          } catch (e) {
+            console.error('Failed to parse line:', line, e);
+          }
         }
       }
       if (finalResults) {
+        console.log('Switching to Results View...');
         setProgress(p => p ? { ...p, step: 'all_done' } : p);
         await new Promise(r => setTimeout(r, 1000));
         setResults(finalResults); setView('results');
+      } else {
+        console.warn('Evaluation finished but no results were received.');
       }
     } catch (err) {
       setError('Cannot reach backend. Make sure the FastAPI server is running on port 8000.');

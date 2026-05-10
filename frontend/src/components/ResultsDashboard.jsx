@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Medal, Search } from 'lucide-react';
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
@@ -173,9 +175,17 @@ const Modal = ({ candidate, onClose, onSave }) => {
 
 /* ── RESULTS DASHBOARD ── */
 const ResultsDashboard = ({ results: init, onReset }) => {
-  const [candidates, setCandidates] = useState(init);
+  const [candidates, setCandidates] = useState(init || []);
   const [selected, setSelected] = useState(null);
 
+  if (!candidates || candidates.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <p style={{ color: 'var(--ink-4)', marginBottom: 20 }}>No evaluation results found.</p>
+        <button className="btn btn-ghost" onClick={onReset}>Go Back</button>
+      </div>
+    );
+  }
   const save = (u) => {
     const next = candidates.map(c=>c.candidate_name===u.candidate_name?u:c).sort((a,b)=>b.total_score-a.total_score);
     setCandidates(next); setSelected(null);
