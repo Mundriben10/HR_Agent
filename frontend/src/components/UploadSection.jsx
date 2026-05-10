@@ -11,36 +11,52 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const handleDrop = (e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) setResumes(e.dataTransfer.files); };
 
   /* Loading screen */
-  if (isLoading && progress) {
-    const pct = (progress.current / progress.total) * 100;
+  if (isLoading) {
+    const isWarmingUp = !progress;
+    const current = progress?.current || 0;
+    const total = progress?.total || (resumes?.length ?? 1);
+    const pct = isWarmingUp ? 5 : (current / total) * 100;
+    const filename = progress?.filename || 'Initializing AI model...';
+    const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
+    
     return (
       <div className="fade-up" style={{ maxWidth: 560, margin: '60px auto', textAlign: 'center' }}>
-        <div style={{
+        <div className="pulse-container" style={{
           width: 72, height: 72, borderRadius: 20, margin: '0 auto 24px',
           background: 'linear-gradient(135deg,#4a9e72,#2d7a52)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 8px 24px rgba(74,158,114,.35)', color: '#fff'
+          boxShadow: '0 8px 24px rgba(74,158,114,.35)', color: '#fff',
+          position: 'relative'
         }}>
-          <Cpu size={32} strokeWidth={1.5} />
+          <div className="pulse-ring" />
+          <Cpu size={32} strokeWidth={1.5} style={{ animation: 'bounce-subtle 2s infinite ease-in-out' }} />
         </div>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 8 }}>Analyzing Talent</h2>
-        <p style={{ color: 'var(--ink-3)', fontSize: '.9rem', marginBottom: 32 }}>
-          AI agents scoring candidates across 5 dimensions in real-time
-        </p>
-        <div className="card" style={{ padding: 28 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-            <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {progress.filename || 'Warming up...'}
+        <p style={{ color: 'var(--ink-3)', fontSize: '.9rem', marginBottom: 32 }}>{statusText}</p>
+        
+        <div className="card" style={{ padding: 28, textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10, alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--ink-4)', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+                {isWarmingUp ? 'Starting' : `Evaluating ${current} of ${total}`}
+              </span>
+              <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {filename}
+              </span>
+            </div>
+            <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--violet)', fontVariantNumeric: 'tabular-nums' }}>
+              {isWarmingUp ? <span className="spinner" style={{ width:14, height:14, borderWidth:2, display:'inline-block', verticalAlign:'middle' }}/> : `${Math.round(pct)}%`}
             </span>
-            <span style={{ fontSize: '.85rem', fontWeight: 800, color: 'var(--violet)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(pct)}%</span>
           </div>
-          <div className="progress-bar" style={{ marginBottom: 24 }}>
-            <div className="progress-fill" style={{ width: `${pct}%` }} />
+          <div className="progress-bar" style={{ marginBottom: 24, height: 8, background: 'var(--sand-200)', overflow: 'hidden' }}>
+            <div className="progress-fill" style={{ width: `${pct}%`, background: 'linear-gradient(90deg, var(--violet), var(--emerald))', transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)' }}>
+              <div className="progress-shimmer" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'flex-start' }}>
             {completedFiles.map((n, i) => (
-              <span key={i} className="fade-up" style={{ padding: '4px 12px', borderRadius: 20, background: 'var(--emerald-bg)', color: 'var(--emerald)', fontSize: '.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CheckCircle size={12} strokeWidth={2} /> {n}
+              <span key={i} className="fade-up" style={{ padding: '5px 12px', borderRadius: 20, background: 'var(--emerald-bg)', color: 'var(--emerald)', fontSize: '.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', border: '1px solid rgba(16,185,129,.2)' }}>
+                <CheckCircle size={14} strokeWidth={2} /> {n}
               </span>
             ))}
           </div>
