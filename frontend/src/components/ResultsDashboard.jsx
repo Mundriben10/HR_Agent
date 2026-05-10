@@ -4,12 +4,13 @@ import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, Che
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
 const DIM = {
-  skills_match:          { label:'Skills',        icon: <Target size={14} strokeWidth={1.5} /> },
-  experience_relevance:  { label:'Experience',    icon: <Briefcase size={14} strokeWidth={1.5} /> },
-  education_certs:       { label:'Education',     icon: <GraduationCap size={14} strokeWidth={1.5} /> },
-  project_portfolio:     { label:'Portfolio',     icon: <FolderOpen size={14} strokeWidth={1.5} /> },
-  communication_quality: { label:'Communication', icon: <MessageSquare size={14} strokeWidth={1.5} /> },
+  skills_match:          { label:'Skills Match',        icon: <Target size={14} strokeWidth={1.5} /> },
+  experience_relevance:  { label:'Experience Relevance',icon: <Briefcase size={14} strokeWidth={1.5} /> },
+  education_certs:       { label:'Education & Certs',   icon: <GraduationCap size={14} strokeWidth={1.5} /> },
+  project_portfolio:     { label:'Project / Portfolio', icon: <FolderOpen size={14} strokeWidth={1.5} /> },
+  communication_quality: { label:'Communication Quality',icon: <MessageSquare size={14} strokeWidth={1.5} /> },
 };
+
 
 const AVATAR_PALETTES = [
   ['#ede9fe','#5b21b6'],['#dbeafe','#1e40af'],['#fce7f3','#9d174d'],
@@ -38,7 +39,7 @@ const DimBars = ({ candidate }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span style={{ color: 'var(--ink-4)', display: 'flex' }}>{m.icon}</span>
               <span style={{ fontSize:'.75rem', fontWeight: 600, color: 'var(--ink-2)' }}>
-                {m.label} <span style={{ color: 'var(--ink-4)', fontWeight: 500 }}>({weight}%)</span>
+                {m.label} <span style={{ color: 'var(--ink-4)', fontWeight: 500 }}>(Weight: {weight}%)</span>
               </span>
             </div>
             <span style={{ fontSize:'.7rem', fontWeight:800, color, padding: '2px 8px', borderRadius: 6, background: `${color}15` }}>
@@ -134,7 +135,7 @@ const Modal = ({ candidate, onClose, onSave }) => {
                       <div style={{ color: 'var(--ink-4)' }}>{m.icon}</div>
                       <span style={{ fontWeight:700, fontSize:'.9rem', color: 'var(--ink-2)' }}>{m.label}</span>
                       <span style={{ fontSize:'.7rem', padding:'2px 8px', borderRadius:20, background:'var(--sand-100)', color:'var(--ink-4)', fontWeight:700 }}>
-                        {Math.round(W[k]*100)}%
+                        Weight: {Math.round(W[k]*100)}%
                       </span>
                     </div>
                     <div style={{ display:'flex', alignItems:'center', gap:14 }}>
