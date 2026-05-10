@@ -36,7 +36,7 @@ def get_llm():
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable is not set.")
     # Using flash as it works reliably for all free tiers
-    return ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=api_key, temperature=0.1)
+    return ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=api_key, temperature=0.1, max_retries=5)
 
 def parse_jd(raw_jd_text: str) -> dict:
     """Step 1: Extract structured requirements from JD"""
@@ -114,11 +114,15 @@ Raw Profile (for Communication eval):
     
     return result_dict
 
+import time
+
 def run_agent_flow(jd_text: str, resume_text: str) -> dict:
     """Orchestrates the 3 steps of the agent flow."""
     try:
         s_jd = parse_jd(jd_text)
+        time.sleep(2) # Prevent rate limit
         s_profile = parse_profile(resume_text)
+        time.sleep(2) # Prevent rate limit
         evaluation = score_profile(s_jd, s_profile, resume_text)
         
         # Mandatory Print Output
