@@ -6,11 +6,16 @@ function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Real-time progress from backend stream
+  const [progress, setProgress] = useState(null); // {current, total, filename, step}
+  const [completedFiles, setCompletedFiles] = useState([]);
 
   const handleEvaluate = async (jdText, resumes) => {
     setIsLoading(true);
     setError(null);
-    
+    setProgress(null);
+    setCompletedFiles([]);
+
     const formData = new FormData();
     formData.append('jd_text', jdText);
     Array.from(resumes).forEach(file => {
@@ -27,46 +32,97 @@ function App() {
         throw new Error(`Server error: ${response.status}`);
       }
 
-      const data = await response.json();
-      if (data.error) {
-         setError(data.error);
-      } else {
-         setResults(data.shortlist);
+      // Read the NDJSON stream line-by-line
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let finalResults = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          try {
+            const event = JSON.parse(line);
+            if (event.type === 'progress') {
+              setProgress({ current: event.current, total: event.total, filename: event.filename, step: event.step });
+              if (event.step === 'done') {
+                setCompletedFiles(prev => [...prev, event.filename]);
+              }
+            } else if (event.type === 'result') {
+              finalResults = event.shortlist;
+            }
+          } catch (e) {
+            // skip malformed lines
+          }
+        }
+      }
+
+      // Show "All done" state briefly before transitioning to results
+      if (finalResults) {
+        setProgress(prev => prev ? { ...prev, step: 'all_done' } : prev);
+        await new Promise(r => setTimeout(r, 1200));
+        setResults(finalResults);
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to connect to the evaluation server. Please ensure the backend is running.");
+      setError("Failed to connect to backend. Please ensure the FastAPI server is running on port 8000.");
     } finally {
       setIsLoading(false);
+      setProgress(null);
     }
   };
 
   const handleReset = () => {
     setResults(null);
     setError(null);
+    setProgress(null);
+    setCompletedFiles([]);
   };
 
   return (
-    <div className="app-container">
-      <header className="header animate-fade-in">
-        <h1>Nexus HR Intelligence</h1>
-        <p>AI-Powered Candidate Shortlisting Engine</p>
-      </header>
+    <>
+      <div className="bg-mesh" />
+      <div className="grid-overlay" />
 
-      <main>
-        {error && (
-          <div className="glass-panel animate-fade-in" style={{ padding: '20px', marginBottom: '24px', borderLeft: '4px solid var(--accent-danger)' }}>
-             <p style={{ color: 'var(--accent-danger)' }}>{error}</p>
+      <div className="app-shell">
+        <header className="app-topbar">
+          <div className="topbar-logo">
+            <div className="topbar-logo-icon">N</div>
+            <div className="topbar-logo-text">
+              Nexus<span>HR</span>
+            </div>
           </div>
-        )}
+          <div className="topbar-badge">AI-Powered Intelligence</div>
+        </header>
 
-        {!results ? (
-          <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} />
-        ) : (
-          <ResultsDashboard results={results} onReset={handleReset} />
-        )}
-      </main>
-    </div>
+        <main className="app-main">
+          {error && (
+            <div className="glass animate-fade-up" style={{ padding: '16px 20px', marginBottom: '24px', borderLeft: '3px solid var(--danger)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{error}</p>
+            </div>
+          )}
+
+          {!results ? (
+            <UploadSection
+              onEvaluate={handleEvaluate}
+              isLoading={isLoading}
+              progress={progress}
+              completedFiles={completedFiles}
+            />
+          ) : (
+            <ResultsDashboard results={results} onReset={handleReset} />
+          )}
+        </main>
+      </div>
+    </>
   );
 }
 

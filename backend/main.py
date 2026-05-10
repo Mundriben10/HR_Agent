@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Dict, Any
+from fastapi.responses import StreamingResponse
+from typing import List
 import os
 import uvicorn
 from datetime import datetime
@@ -39,39 +40,80 @@ async def evaluate_candidates(
     if not os.environ.get("GEMINI_API_KEY"):
          return {"error": "GEMINI_API_KEY environment variable is not set."}
 
-    results = []
+    # Pre-read all files (needed before streaming generator)
+    file_data = []
     for file in resumes:
-        filename = file.filename.lower()
+        filename = file.filename
         file_bytes = await file.read()
-        
-        resume_text = ""
-        if filename.endswith('.pdf'):
-            resume_text = extract_text_from_pdf(file_bytes)
-        elif filename.endswith('.docx'):
-            resume_text = extract_text_from_docx(file_bytes)
-        elif filename.endswith('.json'):
-            resume_text = extract_text_from_json(file_bytes)
-        else:
-            continue
-            
-        if not resume_text:
-            results.append({
-                "candidate_name": file.filename,
-                "error": "Could not extract text from file.",
-                "total_score": 0
-            })
-            continue
+        file_data.append((filename, file_bytes))
 
-        evaluation = run_agent_flow(jd_text, resume_text)
-        evaluation["candidate_name"] = file.filename
-        results.append(evaluation)
-        
-    results.sort(key=lambda x: x.get('total_score', 0), reverse=True)
-    
-    # Generate the physical reports as mandated
-    generate_reports(results)
-    
-    return {"shortlist": results}
+    def generate():
+        total = len(file_data)
+        results = []
+
+        for idx, (filename, file_bytes) in enumerate(file_data):
+            # Send progress event
+            progress = {
+                "type": "progress",
+                "current": idx + 1,
+                "total": total,
+                "filename": filename,
+                "step": "parsing"
+            }
+            yield json.dumps(progress) + "\n"
+
+            fn_lower = filename.lower()
+            resume_text = ""
+            if fn_lower.endswith('.pdf'):
+                resume_text = extract_text_from_pdf(file_bytes)
+            elif fn_lower.endswith('.docx'):
+                resume_text = extract_text_from_docx(file_bytes)
+            elif fn_lower.endswith('.json'):
+                resume_text = extract_text_from_json(file_bytes)
+            else:
+                continue
+
+            if not resume_text:
+                results.append({
+                    "candidate_name": filename,
+                    "error": "Could not extract text from file.",
+                    "total_score": 0
+                })
+                continue
+
+            # Send scoring event
+            scoring_progress = {
+                "type": "progress",
+                "current": idx + 1,
+                "total": total,
+                "filename": filename,
+                "step": "scoring"
+            }
+            yield json.dumps(scoring_progress) + "\n"
+
+            evaluation = run_agent_flow(jd_text, resume_text)
+            evaluation["candidate_name"] = filename
+            results.append(evaluation)
+
+            # Send completed event for this candidate
+            done_progress = {
+                "type": "progress",
+                "current": idx + 1,
+                "total": total,
+                "filename": filename,
+                "step": "done"
+            }
+            yield json.dumps(done_progress) + "\n"
+
+        # Sort and generate reports
+        results.sort(key=lambda x: x.get('total_score', 0), reverse=True)
+        generate_reports(results)
+
+        # Send final result
+        final = {"type": "result", "shortlist": results}
+        yield json.dumps(final) + "\n"
+
+    return StreamingResponse(generate(), media_type="application/x-ndjson")
 
 class OverrideRequest(BaseModel):
     candidate_name: str
@@ -97,4 +139,3 @@ def log_override(request: OverrideRequest):
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
-
