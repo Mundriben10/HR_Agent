@@ -26,8 +26,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     return (
       <div className="animate-fade-up" style={{ textAlign: 'center', padding: '80px 0', maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ marginBottom: '50px' }}>
-          <h2 style={{ fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em' }}>
-            Neural Analysis<br /><span style={{ color: 'var(--accent)' }}>In Progress</span>
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em', color: 'var(--text-primary)' }}>
+            Neural Analysis<br /><span style={{ color: 'var(--accent-neon)' }}>In Progress</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginTop: '16px', fontWeight: 500 }}>
             Processing Talent Pipeline...
@@ -41,12 +41,12 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           </div>
           
           <div style={{ 
-            height: '16px', background: 'rgba(0,0,0,0.4)', borderRadius: '100px', overflow: 'hidden',
-            boxShadow: 'inset 2px 2px 6px rgba(0,0,0,0.8)'
+            height: '16px', background: 'var(--bg-tertiary)', borderRadius: '100px', overflow: 'hidden',
+            boxShadow: 'var(--shadow-neo-inset)'
           }}>
             <div style={{ 
-              height: '100%', width: `${totalProgress}%`, background: 'var(--accent)', borderRadius: '100px', 
-              transition: 'width 0.4s ease', boxShadow: '0 0 20px var(--accent-glow)'
+              height: '100%', width: `${totalProgress}%`, background: '#000', borderRadius: '100px', 
+              transition: 'width 0.4s ease', boxShadow: '0 0 15px var(--accent-neon)'
             }} />
           </div>
 
@@ -75,8 +75,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
       {/* Header */}
       <div className="animate-fade-up" style={{ marginBottom: '60px' }}>
-        <h1 style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.06em', color: '#fff', lineHeight: 0.85, textTransform: 'uppercase' }}>
-          Initialize<br /><span style={{ color: 'var(--accent)' }}>Evaluation</span>
+        <h1 style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.06em', color: 'var(--text-primary)', lineHeight: 0.85, textTransform: 'uppercase' }}>
+          Initialize<br /><span style={{ color: 'var(--accent-neon)' }}>Evaluation</span>
         </h1>
         <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '700px', marginTop: '24px', fontWeight: 500, lineHeight: 1.5 }}>
           Deploy advanced neural agents to filter through your talent pool with 5-dimensional rubric precision.
@@ -87,7 +87,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         {/* Left: JD */}
         <div className="glass" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: 44, height: 44, borderRadius: '12px', background: '#fff', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>01</div>
+            <div style={{ width: 44, height: 44, borderRadius: '12px', background: '#000', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>01</div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Job Parameters</h3>
           </div>
           <textarea
@@ -105,7 +105,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
           <div className="glass" style={{ padding: '32px', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>02</div>
+              <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--accent-neon)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>02</div>
               <h3 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Talent Source</h3>
             </div>
             
@@ -116,18 +116,18 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               onDragLeave={() => setDragOver(false)}
               style={{
                 flex: 1,
-                border: `2px dashed ${dragOver ? 'var(--accent)' : 'rgba(255,255,255,0.05)'}`,
+                border: `2px dashed ${dragOver ? 'var(--accent-neon)' : 'var(--border-subtle)'}`,
                 borderRadius: '24px',
                 textAlign: 'center',
                 cursor: 'pointer',
-                background: dragOver ? 'rgba(0,242,255,0.02)' : 'rgba(0,0,0,0.3)',
+                background: dragOver ? 'var(--accent-bg)' : 'var(--bg-secondary)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
                 padding: '40px',
-                boxShadow: 'inset 4px 4px 15px rgba(0,0,0,0.5)'
+                boxShadow: 'var(--shadow-neo-inset)'
               }}
             >
               <input

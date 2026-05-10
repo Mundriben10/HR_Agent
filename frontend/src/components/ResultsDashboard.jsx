@@ -12,16 +12,16 @@ const ScoreBar = ({ score, size = 'md' }) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
       <div style={{ 
-        flex: 1, height: h, background: 'rgba(0,0,0,0.4)', borderRadius: '100px', overflow: 'hidden',
-        boxShadow: 'inset 2px 2px 5px rgba(0,0,0,0.8), inset -1px -1px 2px rgba(255,255,255,0.05)'
+        flex: 1, height: h, background: 'var(--bg-tertiary)', borderRadius: '100px', overflow: 'hidden',
+        boxShadow: 'var(--shadow-neo-inset)'
       }}>
         <div style={{ 
           height: '100%', width: pct, background: color, borderRadius: '100px', 
           transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)',
-          boxShadow: `0 0 15px ${color}66`
+          boxShadow: `0 0 10px ${color}44`
         }} />
       </div>
-      <span style={{ fontSize: '0.9rem', fontWeight: 900, width: '36px', textAlign: 'right', color: '#fff' }}>{score}</span>
+      <span style={{ fontSize: '0.9rem', fontWeight: 900, width: '36px', textAlign: 'right', color: 'var(--text-primary)' }}>{score}</span>
     </div>
   );
 };
@@ -229,12 +229,12 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
       {/* Metrics Matrix */}
       <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px', marginBottom: '50px' }}>
         {[
-          { label: 'Pool Depth', value: candidates.length, color: '#fff' },
+          { label: 'Pool Depth', value: candidates.length, color: 'var(--text-primary)' },
           { label: 'Peak Rating', value: topScore.toFixed(1), color: 'var(--success)' },
-          { label: 'Shortlisted', value: candidates.filter(c => c.recommendation === 'Hire').length, color: 'var(--accent)' },
+          { label: 'Shortlisted', value: candidates.filter(c => c.recommendation === 'Hire').length, color: 'var(--accent-neon)' },
           { label: 'Review Loop', value: candidates.filter(c => c.recommendation === 'Hold').length, color: 'var(--warning)' },
         ].map((m, i) => (
-          <div key={i} className="glass" style={{ padding: '32px', textAlign: 'left' }}>
+          <div key={i} className="glass" style={{ padding: '32px', textAlign: 'left', background: 'var(--bg-secondary)' }}>
             <div style={{ fontSize: '0.8rem', fontWeight: 900, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '12px' }}>{m.label}</div>
             <div style={{ fontSize: '3rem', fontWeight: 900, color: m.color, letterSpacing: '-0.04em' }}>{m.value}</div>
           </div>
@@ -284,15 +284,15 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                   <div style={{
                     width: 54, height: 54, borderRadius: '18px',
-                    background: i === 0 ? '#fff' : 'var(--bg-tertiary)',
-                    color: i === 0 ? '#000' : '#fff',
+                    background: i === 0 ? '#000' : 'var(--bg-tertiary)',
+                    color: i === 0 ? '#fff' : 'var(--text-primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 900, fontSize: '1.4rem', boxShadow: i === 0 ? '0 0 25px rgba(255,255,255,0.3)' : 'var(--shadow-neo)'
+                    fontWeight: 900, fontSize: '1.4rem', boxShadow: i === 0 ? '0 10px 25px rgba(0,0,0,0.2)' : 'var(--shadow-neo)'
                   }}>
                     {(c.candidate_name || '?')[0].toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: '#fff' }}>{c.candidate_name}</div>
+                    <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{c.candidate_name}</div>
                     <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginTop: '4px' }}>
                       {c.is_overridden && <span className="tag tag-override" style={{ fontSize: '0.65rem' }}>OVERRIDDEN</span>}
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600 }}>IDENTITY VERIFIED</span>

@@ -1,44 +1,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* CRED-Inspired Neo-Skeuomorphic Dark Palette */
-  --bg-primary: #050505;
-  --bg-secondary: #0f0f0f;
-  --bg-sidebar: #0a0a0a;
-  --bg-sidebar-hover: rgba(255, 255, 255, 0.05);
-  --bg-sidebar-active: rgba(255, 255, 255, 0.08);
-  --bg-tertiary: #1a1a1a;
-  --bg-card: #121212;
+  /* Hybrid: Claude Background + CRED Component Design */
+  --bg-primary: #f9f8f6; /* Claude Warm Paper */
+  --bg-secondary: #ffffff;
+  --bg-sidebar: #000000; /* CRED Dark Sidebar */
+  --bg-sidebar-hover: rgba(255, 255, 255, 0.08);
+  --bg-sidebar-active: rgba(255, 255, 255, 0.12);
+  --bg-tertiary: #f1f0ee;
+  --bg-card: #ffffff;
   
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-sidebar: rgba(255, 255, 255, 0.05);
-  --border-glow: rgba(0, 242, 255, 0.3);
+  --border-subtle: #e2e0db;
+  --border-sidebar: rgba(255, 255, 255, 0.1);
+  --border-glow: rgba(0, 242, 255, 0.2);
 
   /* Text Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-muted: #606060;
-  --text-sidebar: #808080;
+  --text-primary: #1d1d1b;
+  --text-secondary: #6b6a65;
+  --text-muted: #9c9a94;
+  --text-sidebar: #a0a09a;
   --text-sidebar-active: #ffffff;
 
-  /* Brand Accents (CRED Neon) */
-  --accent: #00f2ff;
-  --accent-light: #70f9ff;
+  /* Brand Accents (CRED Neon on Claude Paper) */
+  --accent: #000000; /* CRED Primary Black */
+  --accent-neon: #00f2ff; /* CRED Neon Cyan */
+  --accent-light: #333333;
   --accent-glow: rgba(0, 242, 255, 0.4);
   --accent-bg: rgba(0, 242, 255, 0.05);
 
   /* Semantic Status */
-  --success: #00ffaa;
-  --success-bg: rgba(0, 255, 170, 0.1);
-  --warning: #ffcc00;
-  --warning-bg: rgba(255, 204, 0, 0.1);
-  --danger: #ff3366;
-  --danger-bg: rgba(255, 51, 102, 0.1);
+  --success: #059669;
+  --success-bg: #f0fdf4;
+  --warning: #d97706;
+  --warning-bg: #fffbeb;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
   --info: #00f2ff;
 
-  /* CRED Neo-Skeuomorphic Shadows */
-  --shadow-neo: 10px 10px 20px #000000, -5px -5px 15px rgba(255,255,255,0.02);
-  --shadow-neo-inset: inset 4px 4px 8px #000000, inset -2px -2px 6px rgba(255,255,255,0.02);
+  /* Hybrid Neo-Skeuomorphic Shadows (Soft for Light Mode) */
+  --shadow-neo: 10px 10px 20px #e2e0db, -10px -10px 20px #ffffff;
+  --shadow-neo-inset: inset 4px 4px 8px #e2e0db, inset -4px -4px 8px #ffffff;
 }
 
 * {
@@ -108,7 +109,7 @@ body {
 }
 
 .sidebar-logo-text span {
-  color: var(--accent);
+  color: var(--accent-neon);
 }
 
 .sidebar-nav {
@@ -141,8 +142,8 @@ body {
 .nav-item.active {
   background-color: var(--bg-sidebar-active);
   color: #ffffff;
-  box-shadow: var(--shadow-neo);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 30px rgba(0, 242, 255, 0.1);
+  border-left: 4px solid var(--accent-neon);
 }
 
 .sidebar-footer {
@@ -176,7 +177,7 @@ body {
   align-items: center;
   gap: 10px;
   font-size: 0.9rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -193,10 +194,10 @@ body {
   position: relative;
 }
 
-/* ===== CRED NEO-SKEUOMORPHIC COMPONENTS ===== */
+/* ===== HYBRID NEO COMPONENTS ===== */
 .glass {
   background: var(--bg-card);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
   box-shadow: var(--shadow-neo);
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -204,23 +205,23 @@ body {
 
 .glass:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 15px 15px 30px #000000, -5px -5px 20px rgba(255,255,255,0.03);
+  border-color: var(--accent-neon);
+  box-shadow: 15px 15px 30px #e2e0db, -15px -15px 30px #ffffff;
 }
 
 .glass-strong {
   background: var(--bg-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
   border-radius: 20px;
   box-shadow: var(--shadow-neo);
 }
 
-/* ===== BUTTONS (CRED STYLE) ===== */
+/* ===== BUTTONS (CRED STYLE ON LIGHT) ===== */
 .btn {
   font-family: inherit;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 0.9rem;
-  padding: 14px 28px;
+  padding: 16px 32px;
   border-radius: 14px;
   border: none;
   cursor: pointer;
@@ -229,30 +230,31 @@ body {
   gap: 10px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .btn-primary {
-  background-color: #ffffff;
-  color: #000000;
-  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.1);
+  background-color: #000000;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(255, 255, 255, 0.2);
-  background-color: var(--accent);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+  background-color: var(--accent-neon);
+  color: #000000;
 }
 
 .btn-ghost {
   background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  border: 2px solid #000000;
+  color: #000000;
 }
 
 .btn-ghost:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: #ffffff;
+  background-color: #000000;
+  color: #ffffff;
 }
 
 /* ===== FORMS ===== */
@@ -260,19 +262,19 @@ body {
   width: 100%;
   padding: 18px;
   background-color: var(--bg-primary);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
   border-radius: 14px;
   font-family: inherit;
   font-size: 1rem;
-  color: #ffffff;
+  color: var(--text-primary);
   outline: none;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-neo-inset);
 }
 
 .input-field:focus {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-neo-inset), 0 0 20px var(--accent-bg);
+  border-color: var(--accent-neon);
+  box-shadow: var(--shadow-neo-inset), 0 0 15px var(--accent-bg);
 }
 
 /* ===== UTILS ===== */
@@ -280,15 +282,15 @@ body {
   padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
 }
 
-.tag-hire { background: var(--success-bg); color: var(--success); }
-.tag-nohire { background: var(--danger-bg); color: var(--danger); }
-.tag-hold { background: var(--warning-bg); color: var(--warning); }
-.tag-override { background: var(--accent-bg); color: var(--accent); }
+.tag-hire { background: #000000; color: #ffffff; border: 1px solid var(--accent-neon); }
+.tag-nohire { background: #fee2e2; color: #ef4444; }
+.tag-hold { background: #fef3c7; color: #f59e0b; }
+.tag-override { background: var(--bg-sidebar); color: var(--accent-neon); }
 
 /* ANIMATIONS */
 @keyframes fadeUp {
@@ -312,8 +314,8 @@ body {
 .spinner-ring {
   width: 32px;
   height: 32px;
-  border: 4px solid rgba(255, 255, 255, 0.05);
-  border-top-color: var(--accent);
+  border: 4px solid #e2e0db;
+  border-top-color: #000000;
   border-radius: 50%;
   animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
@@ -323,5 +325,5 @@ body {
 /* CUSTOM SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #444; }
+::-webkit-scrollbar-thumb { background: #d1d1cc; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #b1b1ac; }
