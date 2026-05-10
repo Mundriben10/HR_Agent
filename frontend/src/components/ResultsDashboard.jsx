@@ -7,15 +7,15 @@ const ScoreBar = ({ score, size = 'md' }) => {
   let color = 'var(--danger)';
   if (score >= 8) color = 'var(--success)';
   else if (score >= 5) color = 'var(--warning)';
-  else if (score >= 3) color = 'var(--info)';
+  else if (score >= 3) color = 'var(--accent)';
 
-  const h = size === 'sm' ? '4px' : '6px';
+  const h = size === 'sm' ? '6px' : '8px';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
-      <div style={{ flex: 1, height: h, background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: pct, background: color, borderRadius: '3px', transition: 'width 1.2s cubic-bezier(.4,0,.2,1)' }} />
+      <div style={{ flex: 1, height: h, background: 'var(--bg-tertiary)', borderRadius: '100px', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: pct, background: color, borderRadius: '100px', transition: 'width 1s ease' }} />
       </div>
-      <span style={{ fontSize: '0.8rem', fontWeight: 700, width: '32px', textAlign: 'right', color }}>{score}</span>
+      <span style={{ fontSize: '0.85rem', fontWeight: 800, width: '32px', textAlign: 'right', color }}>{score}</span>
     </div>
   );
 };
@@ -71,151 +71,145 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
   const modalContent = (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'var(--bg-primary)',
-      display: 'flex', flexDirection: 'column',
-      overflow: 'hidden',
+      background: 'rgba(15, 23, 42, 0.4)',
+      backdropFilter: 'blur(8px)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '40px',
     }}>
-      {/* Top bar */}
-      <div style={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        borderBottom: '1px solid var(--border-subtle)',
-        flexShrink: 0,
-        padding: '12px 32px',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      <div className="glass-strong animate-fade-up" style={{ 
+        width: '100%', maxWidth: '1100px', height: '100%', 
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <button onClick={onClose} className="btn btn-ghost" style={{ padding: '6px 10px', fontSize: '0.78rem' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Back to List
-          </button>
-          <div style={{ width: '1px', height: '24px', background: 'var(--border-subtle)' }} />
-          <h2 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{candidate.candidate_name}</h2>
-          <span className={`tag tag-${candidate.recommendation === 'Hire' ? 'hire' : candidate.recommendation === 'No-Hire' ? 'nohire' : 'hold'}`}>
-            {candidate.recommendation}
-          </span>
-          {candidate.is_overridden && <span className="tag tag-override">HR Edited</span>}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button onClick={onClose} className="btn btn-ghost" style={{ padding: '8px 16px' }}>Cancel</button>
-          <button onClick={handleSave} className="btn btn-primary" style={{ padding: '8px 20px' }}>Save Changes</button>
-        </div>
-      </div>
-
-      {/* Split panel */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-
-        {/* LEFT — Rubric cards */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {Object.entries(RUBRIC).map(([key, meta]) => {
-            const orig = candidate[key] || { score: 0, justification: 'N/A' };
-            return (
-              <div key={key} className="glass" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{meta.label}</span>
-                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Weight: {meta.weight}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <input
-                      type="number" min="0" max="10" value={edits[key]}
-                      onChange={e => handleScore(key, e.target.value)}
-                      style={{
-                        width: '46px', padding: '4px 6px', borderRadius: '6px', textAlign: 'center',
-                        background: 'var(--bg-primary)', border: `1px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                        color: scoreColor(edits[key]), fontFamily: 'Inter', fontWeight: 700, fontSize: '0.88rem', outline: 'none',
-                      }}
-                    />
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>/10</span>
-                  </div>
-                </div>
-                <ScoreBar score={edits[key]} size="sm" />
-
-                {/* Rubric ranges */}
-                <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
-                  {[
-                    { l: '0 – Poor', v: meta.poor, min: 0, max: 3, color: 'var(--danger)', bg: 'var(--danger-bg)', border: 'rgba(239,68,68,0.3)' },
-                    { l: '5 – Avg', v: meta.avg, min: 4, max: 7, color: 'var(--warning)', bg: 'var(--warning-bg)', border: 'rgba(245,158,11,0.3)' },
-                    { l: '10 – Exc', v: meta.exc, min: 8, max: 10, color: 'var(--success)', bg: 'var(--success-bg)', border: 'rgba(16,185,129,0.3)' }
-                  ].map(c => {
-                    const isActive = edits[key] >= c.min && edits[key] <= c.max;
-                    return (
-                      <div key={c.l} style={{
-                        fontSize: '0.62rem', padding: '3px 6px', borderRadius: '4px', flex: 1, textAlign: 'center',
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? c.color : 'var(--text-muted)',
-                        background: isActive ? c.bg : 'transparent',
-                        border: `1px solid ${isActive ? c.border : 'var(--border-subtle)'}`,
-                        transition: 'all 0.3s ease',
-                      }}>
-                        {c.l}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.4, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  "{orig.justification}"
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* RIGHT — Summary + Override */}
-        <div style={{ width: '340px', flexShrink: 0, borderLeft: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)' }}>
-
-          {/* Score ring */}
-          <div style={{ padding: '28px 24px', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
+        {/* Top bar */}
+        <div style={{
+          background: 'var(--bg-secondary)',
+          borderBottom: '1px solid var(--border-subtle)',
+          padding: '20px 32px',
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <div style={{
-              width: 100, height: 100, borderRadius: '50%', margin: '0 auto 12px',
-              background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, var(--bg-tertiary) 0)`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              width: 44, height: 44, borderRadius: '14px',
+              background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 800, fontSize: '1.2rem', color: 'var(--accent)'
             }}>
-              <div style={{
-                width: 78, height: 78, borderRadius: '50%', background: 'var(--bg-primary)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
-              }}>
-                <span style={{ fontSize: '1.6rem', fontWeight: 800, color: scoreColor(totalScore), letterSpacing: '-0.03em' }}>{totalScore.toFixed(1)}</span>
-                <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 500 }}>out of 10</span>
+              {(candidate.candidate_name || '?')[0].toUpperCase()}
+            </div>
+            <div>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 900, letterSpacing: '-0.02em' }}>{candidate.candidate_name}</h2>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                <span className={`tag tag-${candidate.recommendation === 'Hire' ? 'hire' : candidate.recommendation === 'No-Hire' ? 'nohire' : 'hold'}`}>
+                  {candidate.recommendation}
+                </span>
+                {candidate.is_overridden && <span className="tag tag-override">HR Modified</span>}
               </div>
             </div>
-            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Weighted Total Score</div>
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button onClick={onClose} className="btn btn-ghost">Cancel</button>
+            <button onClick={handleSave} className="btn btn-primary">Apply Changes</button>
+          </div>
+        </div>
 
-          {/* Dimension breakdown */}
-          <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', flex: 1, overflowY: 'auto' }}>
-            <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Contribution Breakdown</div>
+        {/* Split Content */}
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          {/* LEFT: Rubric Scoring */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '32px', display: 'flex', flexDirection: 'column', gap: '16px', background: 'var(--bg-primary)' }}>
+            <h4 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Dimension Scoring</h4>
             {Object.entries(RUBRIC).map(([key, meta]) => {
-              const contribution = (edits[key] * weights[key]).toFixed(1);
+              const orig = candidate[key] || { score: 0, justification: 'N/A' };
               return (
-                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{meta.label}</span>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: scoreColor(edits[key]) }}>{edits[key]}</span>
-                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>× {meta.weight}</span>
-                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>=</span>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>{contribution}</span>
+                <div key={key} className="glass" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <span style={{ fontWeight: 800, fontSize: '0.95rem' }}>{meta.label}</span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '8px' }}>Weight: {meta.weight}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input
+                        type="number" min="0" max="10" value={edits[key]}
+                        onChange={e => handleScore(key, e.target.value)}
+                        style={{
+                          width: '54px', padding: '8px', borderRadius: '10px', textAlign: 'center',
+                          background: 'var(--bg-tertiary)', border: `2px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'transparent'}`,
+                          color: scoreColor(edits[key]), fontWeight: 900, fontSize: '1rem', outline: 'none',
+                        }}
+                      />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>/10</span>
+                    </div>
                   </div>
+                  <ScoreBar score={edits[key]} size="sm" />
+                  
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                      { l: 'Poor', v: meta.poor, min: 0, max: 3, c: 'var(--danger)' },
+                      { l: 'Average', v: meta.avg, min: 4, max: 7, c: 'var(--warning)' },
+                      { l: 'Excellent', v: meta.exc, min: 8, max: 10, c: 'var(--success)' }
+                    ].map(range => {
+                      const active = edits[key] >= range.min && edits[key] <= range.max;
+                      return (
+                        <div key={range.l} style={{
+                          flex: 1, padding: '8px', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 800,
+                          textAlign: 'center', transition: 'all 0.2s',
+                          background: active ? 'var(--bg-secondary)' : 'transparent',
+                          color: active ? range.c : 'var(--text-muted)',
+                          border: `1px solid ${active ? 'var(--border-subtle)' : 'transparent'}`
+                        }}>
+                          {range.l}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5, padding: '12px', background: 'var(--bg-tertiary)', borderRadius: '10px', fontStyle: 'italic' }}>
+                    "{orig.justification}"
+                  </p>
                 </div>
               );
             })}
           </div>
 
-          {/* HR Override */}
-          <div style={{ padding: '16px 24px', flexShrink: 0 }}>
-            <label style={{
-              display: 'block', marginBottom: '6px', fontWeight: 600, fontSize: '0.78rem',
-              color: hasChanges ? 'var(--warning)' : 'var(--text-primary)'
-            }}>
-              HR Override Reason {hasChanges && <span style={{ fontWeight: 400, fontSize: '0.68rem' }}>(required)</span>}
-            </label>
-            <textarea
-              className="input-field"
-              value={reason} onChange={e => setReason(e.target.value)}
-              placeholder="Explain your rationale..."
-              rows={3}
-              style={{ borderColor: hasChanges && !reason ? 'var(--danger)' : undefined, padding: '10px 12px', fontSize: '0.82rem' }}
-            />
+          {/* RIGHT: Summary & Overrides */}
+          <div style={{ width: '380px', background: 'var(--bg-secondary)', borderLeft: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column' }}>
+            {/* Giant Score Ring */}
+            <div style={{ padding: '40px 32px', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
+              <div style={{
+                width: 140, height: 140, borderRadius: '50%', margin: '0 auto 20px',
+                background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, var(--bg-tertiary) 0)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
+              }}>
+                <div style={{ width: 110, height: 110, borderRadius: '50%', background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                  <span style={{ fontSize: '2.2rem', fontWeight: 900, color: scoreColor(totalScore), letterSpacing: '-0.04em' }}>{totalScore.toFixed(1)}</span>
+                  <span style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Aggregate</span>
+                </div>
+              </div>
+              <h4 style={{ fontSize: '0.9rem', fontWeight: 800 }}>Profile Strength</h4>
+            </div>
+
+            {/* Weights */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+               <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '16px' }}>Weightage Analysis</h4>
+               {Object.entries(RUBRIC).map(([key, meta]) => (
+                 <div key={key} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                   <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>{meta.label}</span>
+                   <span style={{ fontSize: '0.85rem', fontWeight: 800 }}>{(edits[key] * weights[key]).toFixed(2)}</span>
+                 </div>
+               ))}
+            </div>
+
+            {/* Override Area */}
+            <div style={{ padding: '24px', background: 'var(--bg-tertiary)', borderTop: '1px solid var(--border-subtle)' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 800, marginBottom: '8px' }}>HR Rationalization</label>
+              <textarea
+                className="input-field"
+                value={reason} onChange={e => setReason(e.target.value)}
+                placeholder="Required for any score adjustments..."
+                rows={4}
+                style={{ background: 'var(--bg-secondary)', fontSize: '0.85rem' }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -240,130 +234,127 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
   const topScore = Math.max(...candidates.map(c => c.total_score || 0));
 
   return (
-    <div className="animate-fade-up" style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div className="animate-fade-up" style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
         <div>
-          <div style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1.5px', color: 'var(--accent-light)', marginBottom: '6px' }}>
-            Evaluation Complete
-          </div>
-          <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-            Ranked Shortlist
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
-            {candidates.length} candidate{candidates.length !== 1 ? 's' : ''} evaluated • Reports saved to server
+          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-0.03em' }}>Evaluation Intelligence</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '4px' }}>
+            Analysis complete for <strong>{candidates.length}</strong> candidates. 
+            Ranked by overall match strength.
           </p>
         </div>
-        <button onClick={onReset} className="btn btn-ghost">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          New Evaluation
+        <button onClick={onReset} className="btn btn-ghost" style={{ border: '1px solid var(--border-subtle)' }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+          Reset Session
         </button>
       </div>
 
-      {/* Summary cards */}
-      <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '24px' }}>
-        <div className="glass" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Total Evaluated</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, letterSpacing: '-0.03em' }}>{candidates.length}</div>
-        </div>
-        <div className="glass" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Top Score</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--success)', letterSpacing: '-0.03em' }}>{topScore.toFixed(1)}</div>
-        </div>
-        <div className="glass" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Recommended Hires</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-light)', letterSpacing: '-0.03em' }}>
-            {candidates.filter(c => c.recommendation === 'Hire').length}
+      {/* Metrics Row */}
+      <div className="stagger" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+        {[
+          { label: 'Pool Size', value: candidates.length, color: 'var(--text-primary)' },
+          { label: 'Benchmark', value: topScore.toFixed(1), color: 'var(--success)' },
+          { label: 'Shortlisted', value: candidates.filter(c => c.recommendation === 'Hire').length, color: 'var(--accent)' },
+          { label: 'Review Loop', value: candidates.filter(c => c.recommendation === 'Hold').length, color: 'var(--warning)' },
+        ].map((m, i) => (
+          <div key={i} className="glass" style={{ padding: '24px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{m.label}</div>
+            <div style={{ fontSize: '2rem', fontWeight: 900, color: m.color, letterSpacing: '-0.02em' }}>{m.value}</div>
           </div>
-        </div>
-        <div className="glass" style={{ padding: '20px' }}>
-          <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>On Hold</div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--warning)', letterSpacing: '-0.03em' }}>
-            {candidates.filter(c => c.recommendation === 'Hold').length}
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Candidate Rows */}
-      <div className="glass-strong" style={{ overflow: 'hidden' }}>
-        {/* Table header */}
+      {/* Main Table Area */}
+      <div className="glass-strong" style={{ overflow: 'hidden', border: '1px solid var(--border-subtle)' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: '48px 1fr 100px 140px 100px 100px',
-          padding: '12px 24px', borderBottom: '1px solid var(--border-subtle)',
-          background: 'var(--bg-tertiary)', fontSize: '0.7rem', fontWeight: 600,
-          color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px'
+          display: 'grid', gridTemplateColumns: '80px 1fr 120px 160px 140px 100px',
+          padding: '20px 24px', borderBottom: '1px solid var(--border-subtle)',
+          background: 'var(--bg-tertiary)', fontSize: '0.75rem', fontWeight: 900,
+          color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em'
         }}>
-          <span>Rank</span><span>Candidate</span><span>Score</span><span style={{ textAlign: 'center' }}>Match</span><span style={{ textAlign: 'center' }}>Decision</span><span style={{ textAlign: 'right' }}>Action</span>
+          <span>Rank</span>
+          <span>Candidate Detail</span>
+          <span>Score</span>
+          <span style={{ textAlign: 'center' }}>Match Profile</span>
+          <span style={{ textAlign: 'center' }}>Verdict</span>
+          <span style={{ textAlign: 'right' }}>Action</span>
         </div>
 
-        {/* Rows */}
         <div className="stagger">
           {candidates.map((c, i) => {
             const score = c.total_score || 0;
-            const pct = topScore > 0 ? (score / 10) * 100 : 0;
+            const pct = (score / 10) * 100;
             const recClass = c.recommendation === 'Hire' ? 'hire' : c.recommendation === 'No-Hire' ? 'nohire' : 'hold';
             return (
               <div key={i} style={{
-                display: 'grid', gridTemplateColumns: '48px 1fr 100px 140px 100px 100px',
-                padding: '16px 24px', alignItems: 'center',
+                display: 'grid', gridTemplateColumns: '80px 1fr 120px 160px 140px 100px',
+                padding: '24px', alignItems: 'center',
                 borderBottom: '1px solid var(--border-subtle)',
-                transition: 'background 0.2s',
-                cursor: 'pointer'
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                background: 'var(--bg-secondary)'
               }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 onClick={() => setSelected(c)}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-primary)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
               >
                 {/* Rank */}
-                <span style={{
-                  fontWeight: 800, fontSize: '1rem',
-                  color: i === 0 ? 'var(--success)' : i === 1 ? 'var(--accent-light)' : 'var(--text-muted)'
+                <div style={{
+                  width: 28, height: 28, borderRadius: '8px',
+                  background: i === 0 ? 'var(--success-bg)' : i === 1 ? 'var(--accent-bg)' : 'var(--bg-tertiary)',
+                  color: i === 0 ? 'var(--success)' : i === 1 ? 'var(--accent)' : 'var(--text-muted)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontWeight: 900, fontSize: '0.85rem'
                 }}>
                   {i + 1}
-                </span>
+                </div>
 
-                {/* Name */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {/* Candidate */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                   <div style={{
-                    width: 34, height: 34, borderRadius: '10px',
-                    background: `linear-gradient(135deg, hsl(${(i * 60) % 360}, 60%, 50%), hsl(${(i * 60 + 40) % 360}, 60%, 40%))`,
+                    width: 44, height: 44, borderRadius: '14px',
+                    background: `linear-gradient(135deg, hsl(${(i * 45) % 360}, 70%, 94%), hsl(${(i * 45) % 360}, 70%, 88%))`,
+                    color: `hsl(${(i * 45) % 360}, 70%, 40%)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 700, fontSize: '0.85rem', color: 'white', flexShrink: 0
+                    fontWeight: 900, fontSize: '1.1rem', border: '1px solid rgba(0,0,0,0.03)'
                   }}>
                     {(c.candidate_name || '?')[0].toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{c.candidate_name}</div>
-                    {c.is_overridden && <span className="tag tag-override" style={{ marginTop: '2px' }}>HR Edited</span>}
+                    <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)' }}>{c.candidate_name}</div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '4px' }}>
+                      {c.is_overridden && <span className="tag tag-override" style={{ fontSize: '0.6rem' }}>Modified</span>}
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Verified Profile</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Score */}
-                <div style={{ fontWeight: 800, fontSize: '1.1rem', color: score >= 7 ? 'var(--success)' : score >= 4 ? 'var(--warning)' : 'var(--danger)' }}>
-                  {score.toFixed(1)}
+                <div style={{ fontWeight: 900, fontSize: '1.4rem', color: score >= 7 ? 'var(--success)' : score >= 4 ? 'var(--warning)' : 'var(--danger)', letterSpacing: '-0.02em' }}>
+                  {score.toFixed(1)}<span style={{ fontSize: '0.8rem', opacity: 0.4, fontWeight: 600 }}>/10</span>
                 </div>
 
-                {/* Bar */}
-                <div style={{ padding: '0 8px' }}>
-                  <div style={{ height: '6px', background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
+                {/* Profile Bar */}
+                <div style={{ padding: '0 16px' }}>
+                  <div style={{ height: '10px', background: 'var(--bg-tertiary)', borderRadius: '100px', overflow: 'hidden', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.05)' }}>
                     <div style={{
-                      height: '100%', width: `${pct}%`, borderRadius: '3px',
+                      height: '100%', width: `${pct}%`, borderRadius: '100px',
                       background: score >= 7 ? 'var(--success)' : score >= 4 ? 'var(--warning)' : 'var(--danger)',
-                      transition: 'width 1.2s cubic-bezier(.4,0,.2,1)'
+                      transition: 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)'
                     }} />
                   </div>
                 </div>
 
-                {/* Recommendation */}
+                {/* Verdict */}
                 <div style={{ textAlign: 'center' }}>
-                  <span className={`tag tag-${recClass}`}>{c.recommendation}</span>
+                  <span className={`tag tag-${recClass}`} style={{ minWidth: '80px', textAlign: 'center' }}>{c.recommendation}</span>
                 </div>
 
                 {/* Action */}
                 <div style={{ textAlign: 'right' }}>
-                  <button className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: '0.78rem' }}
-                    onClick={e => { e.stopPropagation(); setSelected(c); }}>
-                    View
+                  <button className="btn btn-ghost" style={{ padding: '10px 20px', fontSize: '0.85rem', fontWeight: 800, borderRadius: '10px' }}>
+                    Inspect
                   </button>
                 </div>
               </div>
@@ -372,7 +363,6 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
         </div>
       </div>
 
-      {/* Modal */}
       {selected && (
         <CandidateModal candidate={selected} onClose={() => setSelected(null)} onSave={handleSave} />
       )}
