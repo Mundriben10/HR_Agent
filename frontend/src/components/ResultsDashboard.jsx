@@ -71,7 +71,7 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
   const modalContent = (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 9999,
-      background: 'rgba(15, 23, 42, 0.4)',
+      background: 'rgba(29, 29, 27, 0.4)',
       backdropFilter: 'blur(8px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       padding: '40px',
@@ -79,7 +79,6 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
       <div className="glass-strong animate-fade-up" style={{ 
         width: '100%', maxWidth: '1100px', height: '100%', 
         display: 'flex', flexDirection: 'column', overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
       }}>
         {/* Top bar */}
         <div style={{
@@ -178,7 +177,6 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
                 width: 140, height: 140, borderRadius: '50%', margin: '0 auto 20px',
                 background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, var(--bg-tertiary) 0)`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
               }}>
                 <div style={{ width: 110, height: 110, borderRadius: '50%', background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
                   <span style={{ fontSize: '2.2rem', fontWeight: 900, color: scoreColor(totalScore), letterSpacing: '-0.04em' }}>{totalScore.toFixed(1)}</span>
@@ -236,15 +234,15 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
   return (
     <div className="animate-fade-up" style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
         <div>
-          <h2 style={{ fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-0.03em' }}>Evaluation Intelligence</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '4px' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.02em' }}>Shortlist Intelligence</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginTop: '6px' }}>
             Analysis complete for <strong>{candidates.length}</strong> candidates. 
-            Ranked by overall match strength.
+            Ranked by overall dimension match.
           </p>
         </div>
-        <button onClick={onReset} className="btn btn-ghost" style={{ border: '1px solid var(--border-subtle)' }}>
+        <button onClick={onReset} className="btn btn-ghost">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
           Reset Session
         </button>
@@ -258,7 +256,7 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
           { label: 'Shortlisted', value: candidates.filter(c => c.recommendation === 'Hire').length, color: 'var(--accent)' },
           { label: 'Review Loop', value: candidates.filter(c => c.recommendation === 'Hold').length, color: 'var(--warning)' },
         ].map((m, i) => (
-          <div key={i} className="glass" style={{ padding: '24px' }}>
+          <div key={i} style={{ padding: '24px', borderRadius: '16px', border: '1px solid var(--border-subtle)', background: '#fff' }}>
             <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{m.label}</div>
             <div style={{ fontSize: '2rem', fontWeight: 900, color: m.color, letterSpacing: '-0.02em' }}>{m.value}</div>
           </div>

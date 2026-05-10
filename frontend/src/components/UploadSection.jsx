@@ -131,13 +131,13 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
-      <div className="animate-fade-up" style={{ marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '2.2rem', fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginBottom: '8px' }}>
-          Evaluate Talent
+      <div className="animate-fade-up" style={{ marginBottom: '40px' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: '12px' }}>
+          Evaluate Talent Pipeline
         </h1>
-        <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', maxWidth: '600px' }}>
-          Deploy our AI agents to analyze resumes against your specific role requirements. 
-          Get instant, transparent scoring across five key dimensions.
+        <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: '640px', lineHeight: 1.6 }}>
+          Deploy advanced AI agents to analyze candidate profiles against your specific requirements. 
+          Receive transparent, multi-dimensional scoring in seconds.
         </p>
       </div>
 

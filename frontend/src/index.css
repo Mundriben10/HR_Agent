@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* Claude-Inspired Premium Palette (Soft & Easy on Eyes) */
+  /* Claude-Inspired Premium Palette (Indigo Refresh) */
   --bg-primary: #f9f8f6;
   --bg-secondary: #ffffff;
   --bg-sidebar: #1d1d1b;
@@ -12,7 +12,7 @@
   
   --border-subtle: #e2e0db;
   --border-sidebar: rgba(255, 255, 255, 0.1);
-  --border-glow: rgba(217, 119, 87, 0.2);
+  --border-glow: rgba(99, 102, 241, 0.2);
 
   /* Text Colors */
   --text-primary: #1d1d1b;
@@ -21,11 +21,11 @@
   --text-sidebar: #a0a09a;
   --text-sidebar-active: #ffffff;
 
-  /* Brand Accents (Warm & Elegant) */
-  --accent: #d97757;
-  --accent-light: #e69176;
-  --accent-glow: rgba(217, 119, 87, 0.15);
-  --accent-bg: rgba(217, 119, 87, 0.05);
+  /* Brand Accents (Premium Indigo) */
+  --accent: #4f46e5;
+  --accent-light: #6366f1;
+  --accent-glow: rgba(79, 70, 229, 0.15);
+  --accent-bg: rgba(79, 70, 229, 0.05);
 
   /* Semantic Status */
   --success: #059669;
@@ -224,20 +224,20 @@ body {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  box-shadow: var(--shadow-card);
-  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
 }
 
 .glass:hover {
   border-color: var(--accent-light);
-  transform: translateY(-1px);
+  background: var(--bg-primary);
 }
 
 .glass-strong {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 /* ===== BUTTONS ===== */
