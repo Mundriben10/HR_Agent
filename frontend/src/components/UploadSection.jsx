@@ -21,7 +21,12 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     
     return (
       <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-        <div className="spinner" style={{ width: 28, height: 28, borderWidth: 2, borderTopColor: 'var(--ink-3)', borderRightColor: 'var(--ink-3)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', marginBottom: 24, animationDuration: '1s' }} />
+        <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="spinner" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderWidth: 2, borderTopColor: 'var(--violet)', borderRightColor: 'var(--violet)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', animationDuration: '1.2s' }} />
+          <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>
+            {isWarmingUp ? '...' : `${Math.round(pct)}%`}
+          </span>
+        </div>
         <h2 className="serif-heading" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 12 }}>Analyzing Talent</h2>
         
         <div style={{ color: 'var(--ink-4)', fontSize: '.95rem', marginBottom: 32, fontFamily: 'Georgia, serif', fontStyle: 'italic', letterSpacing: '0.01em' }}>

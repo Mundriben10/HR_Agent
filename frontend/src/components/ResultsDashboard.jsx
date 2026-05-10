@@ -305,59 +305,48 @@ const ResultsDashboard = ({ results: init, onReset }) => {
       )}
 
       {/* Remaining candidates grid */}
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:16 }}>
+      <div className="stagger" style={{ display:'flex', flexDirection: 'column', gap:0, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px', overflow: 'hidden' }}>
         {rest.map((c, idx) => {
           const i = idx + 1;
           const score = c.total_score || 0;
           const pal = AVATAR_PALETTES[i % AVATAR_PALETTES.length];
-          const medalColor = i === 1 ? '#dbeafe' : i === 2 ? '#fce7f3' : 'var(--sand-100)';
-          const medalIconColor = i === 1 ? '#1d4ed8' : i === 2 ? '#be185d' : 'var(--ink-4)';
+          const isLast = idx === rest.length - 1;
           
           return (
-            <div key={i} className="candidate-card fade-up" onClick={()=>setSelected(c)} style={{ padding: '24px', border: '1px solid var(--sand-200)', borderRadius: '16px', background: '#fff', display: 'flex', flexDirection: 'column' }}>
-              {/* Card header */}
-              <div style={{ display:'flex', alignItems:'flex-start', justifyContent: 'space-between', gap:12, marginBottom:16 }}>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <div style={{ width:42, height:42, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontFamily: 'Georgia, serif', fontSize:'1.25rem', flexShrink:0 }}>
-                    {(c.candidate_name||'?')[0].toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 className="serif-heading" style={{ fontSize:'1.25rem', fontWeight:400, color:'var(--ink)' }}>{c.candidate_name}</h3>
-                    <div style={{ display:'flex', gap:6, marginTop:4 }}>
+            <div key={i} className="candidate-list-item fade-up" onClick={()=>setSelected(c)} style={{ padding: '20px 24px', borderBottom: isLast ? 'none' : '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e)=>e.currentTarget.style.background='var(--sand-50)'} onMouseLeave={(e)=>e.currentTarget.style.background='transparent'}>
+              {/* Left side: Avatar + Info */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0 }}>
+                <div style={{ width:36, height:36, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontFamily: 'Georgia, serif', fontSize:'1.1rem', flexShrink:0 }}>
+                  {(c.candidate_name||'?')[0].toUpperCase()}
+                </div>
+                <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <h3 className="serif-heading" style={{ fontSize:'1.1rem', fontWeight:400, color:'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.candidate_name}</h3>
+                    <div style={{ display:'flex', gap:6, flexShrink: 0 }}>
                       <span className={`tag tag-${rc(c.recommendation)}`}>{c.recommendation}</span>
                       {c.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
                     </div>
                   </div>
+                  {/* Truncated justification for list view */}
+                  {c.skills_match?.justification && (
+                    <p style={{ fontSize: '.85rem', color: 'var(--ink-4)', fontFamily: 'Georgia, serif', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' }}>
+                      "{c.skills_match.justification}"
+                    </p>
+                  )}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                  <div className="score-ring" style={{ width:40, height:40, background:`conic-gradient(${sc(score)} ${score*10}%, var(--sand-100) 0)` }}>
-                    <div className="score-ring-inner" style={{ width:32, height:32, background: '#fff' }}>
-                      <span style={{ fontSize:'.85rem', fontWeight:800, color:sc(score) }}>{score.toFixed(1)}</span>
-                    </div>
+              </div>
+
+              {/* Right side: Score & Action */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{ fontSize: '.8rem', color: 'var(--ink-4)', textAlign: 'right' }}>
+                    Match<br/><strong style={{ color: sc(score), fontSize: '1.05rem' }}>{score.toFixed(1)}</strong><span style={{ fontSize: '.75rem' }}>/10</span>
+                  </div>
+                  <div className="score-ring" style={{ width:36, height:36, background:`conic-gradient(${sc(score)} ${score*10}%, var(--sand-100) 0)` }}>
+                    <div className="score-ring-inner" style={{ width:28, height:28, background: 'var(--sand-50)' }} />
                   </div>
                 </div>
-              </div>
-
-              {/* Justification highlight if available */}
-              {c.skills_match?.justification && (
-                <div style={{ marginBottom: 16, padding: '12px 16px', background: 'var(--sand-50)', borderRadius: '8px', borderLeft: '2px solid var(--violet)' }}>
-                  <p style={{ fontSize: '.85rem', color: 'var(--ink-3)', fontFamily: 'Georgia, serif', fontStyle: 'italic', lineHeight: 1.5 }}>
-                    "{c.skills_match.justification}"
-                  </p>
-                </div>
-              )}
-
-              {/* Score */}
-              <div style={{ flex: 1 }}>
-                <DimBars candidate={c} />
-              </div>
-
-              {/* Footer */}
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:16, marginTop: 16, borderTop:'1px solid var(--sand-100)' }}>
-                {c.is_overridden && <span className="tag tag-override">Edited</span>}
-                <span style={{ marginLeft:'auto', fontSize:'.78rem', fontWeight:600, color: 'var(--violet)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  Details <Search size={12} strokeWidth={2} />
-                </span>
+                <button className="btn btn-ghost btn-sm" style={{ borderRadius: '6px' }}>Inspect</button>
               </div>
             </div>
           );
