@@ -171,8 +171,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <div style={{ color: 'var(--ink-4)' }}><ShieldCheck size={20} strokeWidth={1.5} /></div>
           <div style={{ flex: 1 }}>
             <p className="label" style={{ marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
-              Gemini API Key (Optional)
-              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--ink-4)' }}>Overrides server default if provided</span>
+              Gemini API Key (Required)
+              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--rose)' }}>Required to prevent developer cost</span>
             </p>
             <div style={{ position: 'relative' }}>
               <input 
@@ -198,7 +198,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         <button
           className="btn btn-primary"
           onClick={() => onEvaluate(jdText, resumes, apiKey)}
-          disabled={!jdText.trim() || !resumes || isLoading}
+          disabled={!jdText.trim() || !resumes || !apiKey.trim() || isLoading}
           style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '6px', height: 56, marginTop: 8 }}
         >
           {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}

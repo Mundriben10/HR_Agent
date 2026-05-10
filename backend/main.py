@@ -40,9 +40,9 @@ async def evaluate_candidates(
     if not resumes:
         raise HTTPException(status_code=400, detail="At least one file must be uploaded.")
 
-    resolved_api_key = api_key or os.environ.get("GEMINI_API_KEY")
+    resolved_api_key = api_key
     if not resolved_api_key:
-         raise HTTPException(status_code=401, detail="Gemini API Key is missing. Please provide it in the UI or set it as an environment variable.")
+         raise HTTPException(status_code=401, detail="Gemini API Key is mandatory. Please provide your own key in the UI to evaluate resumes.")
 
     # Pre-read all files (needed before streaming generator)
     file_data = []
