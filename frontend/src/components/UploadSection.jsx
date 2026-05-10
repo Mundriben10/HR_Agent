@@ -1,4 +1,4 @@
-import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle } from 'lucide-react';
+import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [jdText, setJdText] = useState('');
@@ -20,7 +20,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           boxShadow: '0 8px 24px rgba(74,158,114,.35)', color: '#fff'
         }}>
-          <Cpu size={32} />
+          <Cpu size={32} strokeWidth={1.5} />
         </div>
         <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 8 }}>Analyzing Talent</h2>
         <p style={{ color: 'var(--ink-3)', fontSize: '.9rem', marginBottom: 32 }}>
@@ -39,7 +39,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
             {completedFiles.map((n, i) => (
               <span key={i} className="fade-up" style={{ padding: '4px 12px', borderRadius: 20, background: 'var(--emerald-bg)', color: 'var(--emerald)', fontSize: '.75rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <CheckCircle size={12} /> {n}
+                <CheckCircle size={12} strokeWidth={2} /> {n}
               </span>
             ))}
           </div>
@@ -53,8 +53,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
       {/* ── Hero ── */}
       <div className="fade-up" style={{ marginBottom: 32 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: 'var(--violet-bg)', marginBottom: 16 }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--violet)' }} />
-          <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--violet)', letterSpacing: '.04em' }}>AI-POWERED SHORTLISTING</span>
+          <ShieldCheck size={14} color="var(--violet)" strokeWidth={2} />
+          <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--violet)', letterSpacing: '.04em' }}>ENTERPRISE AI ANALYSIS</span>
         </div>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-.04em', lineHeight: 1.05, marginBottom: 12 }}>
           Find your next<br /><span style={{ color: 'var(--violet)' }}>top candidate.</span>
@@ -72,7 +72,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--violet-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--violet)' }}>
-                <FileText size={18} />
+                <FileText size={18} strokeWidth={1.5} />
               </div>
               <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Job Description</span>
             </div>
@@ -84,7 +84,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
             onChange={e => setJdText(e.target.value)}
             onFocus={() => setJdFocused(true)}
             onBlur={() => setJdFocused(false)}
-            placeholder="Paste job description here...&#10;&#10;e.g. We're looking for a Senior Backend Engineer with 5+ years Python experience, strong knowledge of FastAPI or Django, experience with AWS..."
+            placeholder="Paste job description here..."
             rows={16}
             style={{ flex: 1 }}
           />
@@ -94,7 +94,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--amber)' }}>
-              <Upload size={18} />
+              <Upload size={18} strokeWidth={1.5} />
             </div>
             <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Candidate Resumes</span>
           </div>
@@ -110,15 +110,15 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
             <input type="file" multiple accept=".pdf,.docx,.json" ref={fileRef} style={{ display: 'none' }} onChange={e => e.target.files.length && setResumes(e.target.files)} />
             {resumes ? (
               <>
-                <FileText size={40} color="var(--violet)" />
-                <p style={{ fontWeight: 700, color: 'var(--violet)', fontSize: '1rem' }}>{resumes.length} file{resumes.length > 1 ? 's' : ''} selected</p>
+                <FileText size={40} color="var(--violet)" strokeWidth={1.5} />
+                <p style={{ fontWeight: 700, color: 'var(--violet)', fontSize: '1rem' }}>{resumes.length} profiles selected</p>
                 <p style={{ fontSize: '.78rem', color: 'var(--ink-4)' }}>{Array.from(resumes).map(f => f.name).join(' · ')}</p>
-                <span style={{ fontSize: '.75rem', color: 'var(--violet)', fontWeight: 600, textDecoration: 'underline' }}>Change files</span>
+                <span style={{ fontSize: '.75rem', color: 'var(--violet)', fontWeight: 600, textDecoration: 'underline' }}>Update selection</span>
               </>
             ) : (
               <>
-                <Upload size={40} color="var(--sand-300)" />
-                <p style={{ fontWeight: 700, color: 'var(--ink-2)', fontSize: '.95rem' }}>Drop resumes here</p>
+                <Upload size={40} color="var(--sand-300)" strokeWidth={1.5} />
+                <p style={{ fontWeight: 700, color: 'var(--ink-2)', fontSize: '.95rem' }}>Upload resumes</p>
                 <p style={{ fontSize: '.8rem', color: 'var(--ink-4)' }}>or <span style={{ color: 'var(--violet)', fontWeight: 600 }}>browse files</span> · PDF, DOCX, JSON</p>
               </>
             )}
@@ -128,8 +128,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         {/* Feature tiles row */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[
-            { icon: <Target size={20} />, label: '5 Dimensions', desc: 'Skills, experience, education, portfolio, communication' },
-            { icon: <Zap size={20} />, label: 'Real-time', desc: 'See results stream in as each resume is evaluated' },
+            { icon: <BarChart3 size={20} strokeWidth={1.5} />, label: 'Neural Scoring', desc: 'Skills, experience, education, portfolio, communication' },
+            { icon: <Zap size={20} strokeWidth={1.5} />, label: 'Real-time Analysis', desc: 'Results stream in as each resume is evaluated' },
           ].map((f, i) => (
             <div key={i} className="card" style={{ padding: '14px 16px' }}>
               <div style={{ color: 'var(--violet)', marginBottom: 6 }}>{f.icon}</div>
@@ -146,7 +146,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           disabled={!jdText.trim() || !resumes || isLoading}
           style={{ padding: '16px 28px', fontSize: '1rem', fontWeight: 700, borderRadius: 14, height: 56 }}
         >
-          {isLoading ? <><div className="spinner" />Evaluating...</> : <><Rocket size={18} /> Evaluate Candidates</>}
+          {isLoading ? <><div className="spinner" />Evaluating...</> : <><Rocket size={18} strokeWidth={1.5} /> Start Evaluation Loop</>}
         </button>
       </div>
     </div>

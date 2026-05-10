@@ -2,11 +2,11 @@ import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, Che
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
 const DIM = {
-  skills_match:          { label:'Skills',        icon: <Target size={14} /> },
-  experience_relevance:  { label:'Experience',    icon: <Briefcase size={14} /> },
-  education_certs:       { label:'Education',     icon: <GraduationCap size={14} /> },
-  project_portfolio:     { label:'Portfolio',     icon: <FolderOpen size={14} /> },
-  communication_quality: { label:'Communication', icon: <MessageSquare size={14} /> },
+  skills_match:          { label:'Skills',        icon: <Target size={14} strokeWidth={1.5} /> },
+  experience_relevance:  { label:'Experience',    icon: <Briefcase size={14} strokeWidth={1.5} /> },
+  education_certs:       { label:'Education',     icon: <GraduationCap size={14} strokeWidth={1.5} /> },
+  project_portfolio:     { label:'Portfolio',     icon: <FolderOpen size={14} strokeWidth={1.5} /> },
+  communication_quality: { label:'Communication', icon: <MessageSquare size={14} strokeWidth={1.5} /> },
 };
 
 const AVATAR_PALETTES = [
@@ -194,17 +194,17 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           <h1 style={{ fontSize:'2rem', fontWeight:900, letterSpacing:'-.03em' }}>Candidate Shortlist</h1>
         </div>
         <button className="btn btn-ghost btn-sm" onClick={onReset}>
-          <RotateCcw size={14} /> New Evaluation
+          <RotateCcw size={14} strokeWidth={1.5} /> New Evaluation
         </button>
       </div>
 
       {/* Stat strip */}
       <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14, marginBottom:24 }}>
         {[
-          {label:'Total',val:candidates.length,icon: <Users size={18} />,color:'var(--ink)'},
-          {label:'Shortlisted',val:hired,icon: <CheckCircle size={18} />,color:'var(--emerald)'},
-          {label:'Review',val:candidates.filter(c=>c.recommendation==='Hold').length,icon: <Clock size={18} />,color:'var(--amber)'},
-          {label:'Top Score',val:(Math.max(...candidates.map(c=>c.total_score||0))).toFixed(1),icon: <Trophy size={18} />,color:'var(--violet)'},
+          {label:'Total',val:candidates.length,icon: <Users size={18} strokeWidth={1.5} />,color:'var(--ink)'},
+          {label:'Shortlisted',val:hired,icon: <CheckCircle size={18} strokeWidth={1.5} />,color:'var(--emerald)'},
+          {label:'Review',val:candidates.filter(c=>c.recommendation==='Hold').length,icon: <Clock size={18} strokeWidth={1.5} />,color:'var(--amber)'},
+          {label:'Top Score',val:(Math.max(...candidates.map(c=>c.total_score||0))).toFixed(1),icon: <Trophy size={18} strokeWidth={1.5} />,color:'var(--violet)'},
         ].map((s,i)=>(
           <div key={i} className="card" style={{ padding:'16px 18px', borderLeft:`3px solid ${s.color}` }}>
             <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
@@ -222,7 +222,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           <div style={{ position:'relative', flexShrink:0 }}>
             <Ring score={top.total_score||0} size={110} isDark />
             <div style={{ position:'absolute', top:-6, left:-6, background:'#fbbf24', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', color: '#b45309', boxShadow:'0 2px 8px rgba(0,0,0,.2)' }}>
-              <Trophy size={14} strokeWidth={3} />
+              <Trophy size={14} strokeWidth={2.5} />
             </div>
           </div>
           <div style={{ flex:1 }}>
@@ -235,7 +235,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
             <DimBars candidate={top} isDark />
           </div>
           <button className="btn" style={{ background:'rgba(255,255,255,.12)', color:'#fff', border:'1px solid rgba(255,255,255,.15)', flexShrink:0, gap: '8px' }}>
-            Inspect Profile <Search size={16} />
+            Inspect Profile <Search size={16} strokeWidth={1.5} />
           </button>
         </div>
       )}
@@ -261,7 +261,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
                   <span className={`tag tag-${rc(c.recommendation)}`} style={{ marginTop:2 }}>{c.recommendation}</span>
                 </div>
                 <div className="medal" style={{ background: medalColor, color: medalIconColor }}>
-                  {i < 3 ? <Medal size={14} strokeWidth={3} /> : i + 1}
+                  {i < 3 ? <Medal size={14} strokeWidth={2} /> : i + 1}
                 </div>
               </div>
 
@@ -277,7 +277,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', paddingTop:4, borderTop:'1px solid var(--sand-100)' }}>
                 {c.is_overridden && <span className="tag tag-override">Edited</span>}
                 <span style={{ marginLeft:'auto', fontSize:'.78rem', fontWeight:600, color: 'var(--violet)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  Details <Search size={12} />
+                  Details <Search size={12} strokeWidth={2} />
                 </span>
               </div>
             </div>
@@ -289,7 +289,5 @@ const ResultsDashboard = ({ results: init, onReset }) => {
     </div>
   );
 };
-
-export default ResultsDashboard;
 
 export default ResultsDashboard;
