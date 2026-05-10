@@ -4,236 +4,143 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [jdText, setJdText] = useState('');
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
-  const fileInputRef = useRef();
+  const [jdFocused, setJdFocused] = useState(false);
+  const fileRef = useRef();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (jdText && resumes) onEvaluate(jdText, resumes);
-  };
+  const handleDrop = (e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) setResumes(e.dataTransfer.files); };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragOver(false);
-    if (e.dataTransfer.files.length > 0) setResumes(e.dataTransfer.files);
-  };
-
-  /* ── Loading / Progress State ── */
+  /* Loading screen */
   if (isLoading && progress) {
     const pct = (progress.current / progress.total) * 100;
     return (
-      <div className="animate-fade-up" style={{ maxWidth: '560px', margin: '40px auto', textAlign: 'center' }}>
-        <div style={{ marginBottom: '36px' }}>
-          <div style={{ width: 64, height: 64, borderRadius: '20px',
-            background: 'linear-gradient(135deg, var(--brand), var(--brand-dark))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 20px', boxShadow: 'var(--shadow-brand)' }}>
-            <span style={{ fontSize: '1.75rem' }}>🔍</span>
-          </div>
-          <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-0.025em' }}>
-            Analyzing Resumes
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '8px', fontSize: '0.9rem' }}>
-            Our AI agents are scoring each candidate across 5 dimensions.
-          </p>
-        </div>
-
-        <div className="glass" style={{ padding: '32px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)',
-              maxWidth: '75%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {progress.filename || 'Initializing agents...'}
+      <div className="fade-up" style={{ maxWidth: 560, margin: '60px auto', textAlign: 'center' }}>
+        <div style={{
+          width: 72, height: 72, borderRadius: 20, margin: '0 auto 24px',
+          background: 'linear-gradient(135deg,#5b4cdb,#8b5cf6)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(91,76,219,.35)', fontSize: '2rem'
+        }}>🤖</div>
+        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, letterSpacing: '-.03em', marginBottom: 8 }}>Analyzing Talent</h2>
+        <p style={{ color: 'var(--ink-3)', fontSize: '.9rem', marginBottom: 32 }}>
+          AI agents scoring candidates across 5 dimensions in real-time
+        </p>
+        <div className="card" style={{ padding: 28 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+            <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', maxWidth: '70%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {progress.filename || 'Warming up...'}
             </span>
-            <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--brand)',
-              fontFamily: "'JetBrains Mono', monospace" }}>
-              {Math.round(pct)}%
-            </span>
+            <span style={{ fontSize: '.85rem', fontWeight: 800, color: 'var(--violet)', fontVariantNumeric: 'tabular-nums' }}>{Math.round(pct)}%</span>
           </div>
-
-          <div className="progress-track" style={{ height: '10px', marginBottom: '24px' }}>
-            <div className="progress-fill" style={{
-              width: `${pct}%`,
-              background: 'linear-gradient(90deg, var(--brand-light), var(--brand-dark))',
-              transition: 'width 0.4s ease'
-            }} />
+          <div className="progress-bar" style={{ marginBottom: 24 }}>
+            <div className="progress-fill" style={{ width: `${pct}%` }} />
           </div>
-
-          {completedFiles.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {completedFiles.map((name, i) => (
-                <div key={i} className="animate-fade-in" style={{
-                  display: 'flex', alignItems: 'center', gap: '6px',
-                  padding: '5px 12px', borderRadius: '20px',
-                  background: 'var(--success-bg)', color: 'var(--success)',
-                  fontSize: '0.75rem', fontWeight: 600 }}>
-                  ✓ {name}
-                </div>
-              ))}
-            </div>
-          )}
-
-          {progress.step === 'all_done' && (
-            <div className="animate-fade-in" style={{ marginTop: '20px', display: 'flex',
-              alignItems: 'center', justifyContent: 'center', gap: '8px',
-              color: 'var(--success)', fontWeight: 700, fontSize: '0.9rem' }}>
-              <span>✅</span> All candidates evaluated. Loading results...
-            </div>
-          )}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+            {completedFiles.map((n, i) => (
+              <span key={i} className="fade-up" style={{ padding: '4px 12px', borderRadius: 20, background: 'var(--emerald-bg)', color: 'var(--emerald)', fontSize: '.75rem', fontWeight: 700 }}>✓ {n}</span>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
-  /* ── Upload Form ── */
-  const canSubmit = !isLoading && jdText.trim() && resumes;
-
   return (
-    <div style={{ maxWidth: '1050px', margin: '0 auto' }}>
-
-      {/* ── Hero Header ── */}
-      <div className="animate-fade-up" style={{ marginBottom: '40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '16px' }}>
-          <div style={{ width: 48, height: 48, borderRadius: '14px',
-            background: 'linear-gradient(135deg, var(--brand), var(--brand-dark))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: 'var(--shadow-brand)' }}>
-            <span style={{ fontSize: '1.4rem' }}>🧠</span>
-          </div>
-          <div>
-            <div className="section-label">AI-Powered Evaluation</div>
-            <h1 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.1 }}>
-              Smart Talent Shortlisting
-            </h1>
-          </div>
+    <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      {/* ── Hero ── */}
+      <div className="fade-up" style={{ marginBottom: 32 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: 'var(--violet-bg)', marginBottom: 16 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--violet)' }} />
+          <span style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--violet)', letterSpacing: '.04em' }}>AI-POWERED SHORTLISTING</span>
         </div>
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '580px', lineHeight: 1.65 }}>
-          Paste your job description, upload candidate resumes, and get instant ranked shortlists with
-          multi-dimensional AI scoring across skills, experience, education, portfolio, and communication.
+        <h1 style={{ fontSize: '2.5rem', fontWeight: 900, letterSpacing: '-.04em', lineHeight: 1.05, marginBottom: 12 }}>
+          Find your next<br /><span style={{ color: 'var(--violet)' }}>top candidate.</span>
+        </h1>
+        <p style={{ fontSize: '.95rem', color: 'var(--ink-3)', maxWidth: 500, lineHeight: 1.65 }}>
+          Paste a job description, upload resumes, and receive a ranked shortlist with transparent AI scoring in seconds.
         </p>
       </div>
 
-      {/* ── Feature Pills ── */}
-      <div className="animate-fade-up" style={{ display: 'flex', gap: '10px', marginBottom: '36px', flexWrap: 'wrap' }}>
-        {['🎯 5-Dimension Scoring', '⚡ Real-time Analysis', '📊 Ranked Shortlist', '✏️ HR Override Support'].map((f, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px',
-            padding: '6px 14px', borderRadius: '20px',
-            background: 'var(--bg-elevated)', border: '1px solid var(--border)',
-            fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-secondary)',
-            boxShadow: 'var(--shadow-xs)' }}>
-            {f}
-          </div>
-        ))}
-      </div>
+      {/* ── Bento Grid ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
 
-      {/* ── Main Form ── */}
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-
-        {/* ── Left: Job Description ── */}
-        <div className="glass stagger" style={{ padding: '28px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: 28, height: 28, borderRadius: '8px', background: 'var(--brand-subtle)',
-              color: 'var(--brand-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: 800, fontSize: '0.8rem' }}>01</div>
-            <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Job Description</h3>
+        {/* JD Card */}
+        <div className={`card ${jdFocused ? 'card-focus' : ''}`} style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14, gridRow: 'span 2' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 8, background: 'var(--violet-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.85rem' }}>📋</div>
+              <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Job Description</span>
+            </div>
+            <span className="label">{jdText.trim().split(/\s+/).filter(Boolean).length || 0} words</span>
           </div>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            Paste the full job description — the AI will extract requirements automatically.
-          </p>
           <textarea
             className="input-field"
             value={jdText}
             onChange={e => setJdText(e.target.value)}
-            placeholder="e.g. We are looking for a Senior Backend Engineer with 5+ years of Python experience..."
-            required
-            rows={13}
-            style={{ flex: 1, resize: 'none', lineHeight: 1.6 }}
+            onFocus={() => setJdFocused(true)}
+            onBlur={() => setJdFocused(false)}
+            placeholder="Paste job description here...&#10;&#10;e.g. We're looking for a Senior Backend Engineer with 5+ years Python experience, strong knowledge of FastAPI or Django, experience with AWS..."
+            rows={16}
+            style={{ flex: 1 }}
           />
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-            {jdText.length > 0 ? `${jdText.split(/\s+/).filter(Boolean).length} words` : 'Empty'}
-          </div>
         </div>
 
-        {/* ── Right: Resumes + Submit ── */}
-        <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-
-          {/* File Upload */}
-          <div className="glass" style={{ padding: '28px', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ width: 28, height: 28, borderRadius: '8px', background: 'var(--amber-bg)',
-                color: 'var(--amber)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 800, fontSize: '0.8rem' }}>02</div>
-              <h3 style={{ fontWeight: 700, fontSize: '1rem' }}>Candidate Resumes</h3>
-            </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Upload PDF or DOCX files. Multiple files supported.
-            </p>
-
-            {/* Drop Zone */}
-            <div
-              onClick={() => fileInputRef.current.click()}
-              onDrop={handleDrop}
-              onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-              onDragLeave={() => setDragOver(false)}
-              style={{
-                flex: 1, borderRadius: '14px', cursor: 'pointer',
-                border: `2px dashed ${dragOver ? 'var(--brand)' : 'var(--border)'}`,
-                background: dragOver ? 'var(--bg-accent)' : 'var(--bg-base)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                padding: '32px 20px', textAlign: 'center',
-                transition: 'all 0.2s ease',
-                minHeight: '180px'
-              }}
-            >
-              <input type="file" multiple accept=".pdf,.docx,.json"
-                ref={fileInputRef}
-                onChange={e => e.target.files.length > 0 && setResumes(e.target.files)}
-                style={{ display: 'none' }} required />
-
-              {resumes ? (
-                <div className="animate-fade-in">
-                  <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📂</div>
-                  <p style={{ fontWeight: 700, color: 'var(--brand)', fontSize: '1.1rem' }}>
-                    {resumes.length} {resumes.length === 1 ? 'File' : 'Files'} Ready
-                  </p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    {Array.from(resumes).map(f => f.name).join(', ')}
-                  </p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--brand)', marginTop: '10px', fontWeight: 600 }}>
-                    Click to change files
-                  </p>
-                </div>
-              ) : (
-                <div className="animate-fade-in">
-                  <div style={{ fontSize: '2.5rem', marginBottom: '12px', opacity: 0.6 }}>📤</div>
-                  <p style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>
-                    Drop resumes here
-                  </p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    or <span style={{ color: 'var(--brand)', fontWeight: 600, textDecoration: 'underline' }}>browse your files</span>
-                  </p>
-                  <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '10px' }}>
-                    Supports PDF, DOCX, JSON
-                  </p>
-                </div>
-              )}
-            </div>
+        {/* Upload Zone Card */}
+        <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '.85rem' }}>📂</div>
+            <span style={{ fontWeight: 700, fontSize: '.95rem' }}>Candidate Resumes</span>
           </div>
 
-          {/* ── Submit Button ── */}
-          <button type="submit" className="btn btn-primary" disabled={!canSubmit}
-            style={{ padding: '18px', fontSize: '1rem', fontWeight: 700, borderRadius: '14px' }}>
-            {isLoading ? (
-              <><div className="spinner-ring" />Evaluating...</>
+          <div
+            className={`upload-zone ${dragOver ? 'drag-over' : ''}`}
+            onClick={() => fileRef.current.click()}
+            onDrop={handleDrop}
+            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+            onDragLeave={() => setDragOver(false)}
+            style={{ flex: 1, minHeight: 140 }}
+          >
+            <input type="file" multiple accept=".pdf,.docx,.json" ref={fileRef} style={{ display: 'none' }} onChange={e => e.target.files.length && setResumes(e.target.files)} />
+            {resumes ? (
+              <>
+                <div style={{ fontSize: '2rem' }}>📁</div>
+                <p style={{ fontWeight: 700, color: 'var(--violet)', fontSize: '1rem' }}>{resumes.length} file{resumes.length > 1 ? 's' : ''} selected</p>
+                <p style={{ fontSize: '.78rem', color: 'var(--ink-4)' }}>{Array.from(resumes).map(f => f.name).join(' · ')}</p>
+                <span style={{ fontSize: '.75rem', color: 'var(--violet)', fontWeight: 600, textDecoration: 'underline' }}>Change files</span>
+              </>
             ) : (
-              <>🚀 Evaluate Candidates</>
+              <>
+                <div style={{ fontSize: '2rem', opacity: .5 }}>📤</div>
+                <p style={{ fontWeight: 700, color: 'var(--ink-2)', fontSize: '.95rem' }}>Drop resumes here</p>
+                <p style={{ fontSize: '.8rem', color: 'var(--ink-4)' }}>or <span style={{ color: 'var(--violet)', fontWeight: 600 }}>browse files</span> · PDF, DOCX, JSON</p>
+              </>
             )}
-          </button>
-
-          {/* Disclaimer */}
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.5 }}>
-            Results are AI-generated suggestions. Human review is recommended for final decisions.
-          </p>
+          </div>
         </div>
-      </form>
+
+        {/* Feature tiles row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          {[
+            { icon: '🎯', label: '5 Dimensions', desc: 'Skills, experience, education, portfolio, communication' },
+            { icon: '⚡', label: 'Real-time', desc: 'See results stream in as each resume is evaluated' },
+          ].map((f, i) => (
+            <div key={i} className="card" style={{ padding: '14px 16px' }}>
+              <div style={{ fontSize: '1.2rem', marginBottom: 6 }}>{f.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: '.82rem', marginBottom: 3 }}>{f.label}</div>
+              <div style={{ fontSize: '.75rem', color: 'var(--ink-4)', lineHeight: 1.4 }}>{f.desc}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Submit button (bottom right) */}
+        <button
+          className="btn btn-primary"
+          onClick={() => onEvaluate(jdText, resumes)}
+          disabled={!jdText.trim() || !resumes || isLoading}
+          style={{ padding: '16px 28px', fontSize: '1rem', fontWeight: 700, borderRadius: 14, height: 56 }}
+        >
+          {isLoading ? <><div className="spinner" />Evaluating...</> : <>🚀 Evaluate Candidates</>}
+        </button>
+      </div>
     </div>
   );
 };
