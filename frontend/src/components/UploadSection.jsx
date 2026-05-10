@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3 } from 'lucide-react';
 
 const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
@@ -6,7 +6,25 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [jdFocused, setJdFocused] = useState(false);
+  const [simulatedPct, setSimulatedPct] = useState(0);
   const fileRef = useRef();
+
+  useEffect(() => {
+    let interval;
+    if (isLoading) {
+      interval = setInterval(() => {
+        setSimulatedPct(prev => {
+          if (prev >= 99) return 99;
+          const chance = prev > 80 ? 0.2 : prev > 50 ? 0.5 : 0.9;
+          if (Math.random() < chance) return prev + 1;
+          return prev;
+        });
+      }, 400);
+    } else {
+      setSimulatedPct(0);
+    }
+    return () => clearInterval(interval);
+  }, [isLoading]);
 
   const handleDrop = (e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) setResumes(e.dataTransfer.files); };
 
@@ -15,7 +33,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     const isWarmingUp = !progress;
     const current = progress?.current || 0;
     const total = progress?.total || (resumes?.length ?? 1);
-    const pct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
+    const basePct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
+    const displayPct = Math.max(basePct, simulatedPct);
     const filename = progress?.filename || 'Initializing AI model...';
     const statusText = isWarmingUp ? 'Connecting to secure AI environment' : 'AI agents scoring candidates in real-time';
     
@@ -24,7 +43,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="spinner" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderWidth: 2, borderTopColor: 'var(--violet)', borderRightColor: 'var(--violet)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', animationDuration: '1.2s' }} />
           <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>
-            {isWarmingUp ? '...' : `${Math.round(pct)}%`}
+            {isWarmingUp ? '...' : `${displayPct}%`}
           </span>
         </div>
         <h2 className="serif-heading" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 12 }}>Analyzing Talent</h2>
