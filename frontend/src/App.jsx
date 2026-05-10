@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import UploadSection from './components/UploadSection';
 import ResultsDashboard from './components/ResultsDashboard';
+import { LayoutDashboard, Users, User, AlertCircle, Sparkles } from 'lucide-react';
 
 function App() {
   const [results, setResults] = useState(null);
@@ -49,30 +50,21 @@ function App() {
 
   const handleReset = () => { setResults(null); setError(null); setProgress(null); setCompletedFiles([]); setView('dashboard'); };
 
-  const IconGrid = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-    </svg>
-  );
-
-  const IconUsers = () => (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-    </svg>
-  );
-
   return (
     <div className="app-shell">
       {/* Icon-only sidebar */}
       <aside className="app-sidebar">
-        <div className="sidebar-logo">N</div>
+        <div className="sidebar-logo">
+          <Sparkles size={18} strokeWidth={3} />
+        </div>
         <div className="sidebar-sep" />
 
-        <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')} title="Dashboard">
-          <IconGrid />
+        <button 
+          className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
+          onClick={() => setView('dashboard')} 
+          title="Dashboard"
+        >
+          <LayoutDashboard size={20} />
         </button>
         <button
           className={`nav-btn ${view === 'results' ? 'active' : ''}`}
@@ -80,11 +72,13 @@ function App() {
           style={{ opacity: results ? 1 : 0.35, cursor: results ? 'pointer' : 'not-allowed' }}
           title="Evaluations"
         >
-          <IconUsers />
+          <Users size={20} />
           {results && <span className="dot" />}
         </button>
 
-        <button className="nav-btn nav-btn-bottom avatar-btn" title="HR Manager">HR</button>
+        <button className="nav-btn nav-btn-bottom avatar-btn" title="HR Manager">
+          <User size={16} />
+        </button>
       </aside>
 
       {/* Content */}
@@ -95,7 +89,9 @@ function App() {
           </span>
           <div className="topbar-right">
             {error && (
-              <span style={{ fontSize: '.8rem', color: 'var(--rose)', fontWeight: 600 }}>⚠ Backend offline</span>
+              <span style={{ fontSize: '.8rem', color: 'var(--rose)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <AlertCircle size={14} /> Backend offline
+              </span>
             )}
             <div className="status-pill">AI Ready</div>
           </div>
