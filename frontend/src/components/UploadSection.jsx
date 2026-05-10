@@ -6,6 +6,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [jdFocused, setJdFocused] = useState(false);
+  const [apiKey, setApiKey] = useState('');
   const [displayPct, setDisplayPct] = useState(0);
   const fileRef = useRef();
 
@@ -164,15 +165,34 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           ))}
         </div>
 
-        {/* Submit button (bottom right) */}
-        <button
-          className="btn btn-primary"
-          onClick={() => onEvaluate(jdText, resumes)}
-          disabled={!jdText.trim() || !resumes || isLoading}
-          style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '6px', height: 56, marginTop: 8 }}
-        >
-          {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
-        </button>
+        {/* AI Key & Submit */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ padding: 20, background: 'var(--sand-50)', border: '1px solid var(--sand-200)', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Sparkles size={14} color="var(--violet)" />
+              <span style={{ fontSize: '.75rem', fontWeight: 600, color: 'var(--ink-3)', letterSpacing: '.05em' }}>AI SETTINGS (OPTIONAL)</span>
+            </div>
+            <input 
+              type="password" 
+              placeholder="Paste custom Gemini API Key to override .env"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              style={{ width: '100%', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--sand-200)', fontSize: '.85rem', outline: 'none' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--violet)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--sand-200)'}
+            />
+            <p style={{ fontSize: '.7rem', color: 'var(--ink-4)', fontStyle: 'italic' }}>Use this if you hit free tier limits on the server key.</p>
+          </div>
+
+          <button
+            className="btn btn-primary"
+            onClick={() => onEvaluate(jdText, resumes, apiKey)}
+            disabled={!jdText.trim() || !resumes || isLoading}
+            style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '6px', height: 56, width: '100%' }}
+          >
+            {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
+          </button>
+        </div>
       </div>
     </div>
   );

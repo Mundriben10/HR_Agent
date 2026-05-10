@@ -31,16 +31,16 @@ class CandidateEvaluation(BaseModel):
     total_score: float = Field(description="Weighted total score based on the rubric weights")
     recommendation: str = Field(description="'Hire', 'No-Hire', or 'Hold' recommendation")
 
-def get_llm():
-    api_key = os.environ.get("GEMINI_API_KEY")
+def get_llm(custom_api_key=None):
+    api_key = custom_api_key or os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable is not set.")
+        raise ValueError("GEMINI_API_KEY environment variable is not set and no custom key provided.")
     # Using flash as it works reliably for all free tiers
     return ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1)
 
-def parse_jd(raw_jd_text: str) -> dict:
+def parse_jd(raw_jd_text: str, api_key: str = None) -> dict:
     """Step 1: Extract structured requirements from JD"""
-    llm = get_llm()
+    llm = get_llm(api_key)
     parser = PydanticOutputParser(pydantic_object=StructuredJD)
     prompt = PromptTemplate(
         template="Extract the core requirements from this Job Description.\n{format_instructions}\n\nJD:\n{jd}",
@@ -50,9 +50,9 @@ def parse_jd(raw_jd_text: str) -> dict:
     chain = prompt | llm | parser
     return chain.invoke({"jd": raw_jd_text}).model_dump()
 
-def parse_profile(raw_profile_text: str) -> dict:
+def parse_profile(raw_profile_text: str, api_key: str = None) -> dict:
     """Step 2: Parse raw resume/LinkedIn text into structured fields"""
-    llm = get_llm()
+    llm = get_llm(api_key)
     parser = PydanticOutputParser(pydantic_object=StructuredProfile)
     prompt = PromptTemplate(
         template="Extract the candidate's core details from this resume or LinkedIn profile.\n{format_instructions}\n\nProfile:\n{profile}",
@@ -62,9 +62,9 @@ def parse_profile(raw_profile_text: str) -> dict:
     chain = prompt | llm | parser
     return chain.invoke({"profile": raw_profile_text}).model_dump()
 
-def score_profile(structured_jd: dict, structured_profile: dict, raw_profile_text: str) -> dict:
+def score_profile(structured_jd: dict, structured_profile: dict, raw_profile_text: str, api_key: str = None) -> dict:
     """Step 3: Compare structured profile against JD and compute rubric scores"""
-    llm = get_llm()
+    llm = get_llm(api_key)
     parser = PydanticOutputParser(pydantic_object=CandidateEvaluation)
     prompt = PromptTemplate(
         template="""You are an expert AI HR assistant evaluating a candidate against a Job Description.
@@ -114,12 +114,12 @@ Raw Profile (for Communication eval):
     
     return result_dict
 
-def run_agent_flow(jd_text: str, resume_text: str) -> dict:
+def run_agent_flow(jd_text: str, resume_text: str, api_key: str = None) -> dict:
     """Orchestrates the 3 steps of the agent flow."""
     try:
-        s_jd = parse_jd(jd_text)
-        s_profile = parse_profile(resume_text)
-        evaluation = score_profile(s_jd, s_profile, resume_text)
+        s_jd = parse_jd(jd_text, api_key)
+        s_profile = parse_profile(resume_text, api_key)
+        evaluation = score_profile(s_jd, s_profile, resume_text, api_key)
         
         # Mandatory Print Output
         print("\n" + "="*50)

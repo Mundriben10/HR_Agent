@@ -11,10 +11,11 @@ function App() {
   const [progress, setProgress] = useState(null);
   const [completedFiles, setCompletedFiles] = useState([]);
 
-  const handleEvaluate = async (jdText, resumes) => {
+  const handleEvaluate = async (jdText, resumes, apiKey = '') => {
     setIsLoading(true); setError(null); setProgress(null); setCompletedFiles([]);
     const formData = new FormData();
     formData.append('jd_text', jdText);
+    if (apiKey) formData.append('api_key', apiKey);
     Array.from(resumes).forEach(f => formData.append('resumes', f));
     const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
     try {

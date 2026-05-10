@@ -31,7 +31,8 @@ def read_root():
 @app.post("/api/evaluate")
 async def evaluate_candidates(
     jd_text: str = Form(...),
-    resumes: List[UploadFile] = File(...)
+    resumes: List[UploadFile] = File(...),
+    api_key: str = Form(None)
 ):
     if not jd_text:
         raise HTTPException(status_code=400, detail="Job Description text is required.")
@@ -39,8 +40,8 @@ async def evaluate_candidates(
     if not resumes:
         raise HTTPException(status_code=400, detail="At least one file must be uploaded.")
 
-    if not os.environ.get("GEMINI_API_KEY"):
-         return {"error": "GEMINI_API_KEY environment variable is not set."}
+    if not api_key and not os.environ.get("GEMINI_API_KEY"):
+         return {"error": "GEMINI_API_KEY environment variable is not set and no custom key provided."}
 
     # Pre-read all files (needed before streaming generator)
     file_data = []
@@ -93,7 +94,7 @@ async def evaluate_candidates(
             }
             yield json.dumps(scoring_progress) + "\n"
 
-            evaluation = run_agent_flow(jd_text, resume_text)
+            evaluation = run_agent_flow(jd_text, resume_text, api_key)
             evaluation["candidate_name"] = filename
             results.append(evaluation)
 
