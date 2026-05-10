@@ -16,8 +16,9 @@ function App() {
     const formData = new FormData();
     formData.append('jd_text', jdText);
     Array.from(resumes).forEach(f => formData.append('resumes', f));
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
     try {
-      const response = await fetch('http://localhost:8000/api/evaluate', { method: 'POST', body: formData });
+      const response = await fetch(`${API_BASE}/api/evaluate`, { method: 'POST', body: formData });
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();

@@ -89,7 +89,8 @@ const Modal = ({ candidate, onClose, onSave }) => {
       ...Object.fromEntries(Object.keys(DIM).map(k=>[k,{...candidate[k],score:edits[k]}])),
       total_score:total, override_reason:reason, is_overridden:hasChanges||candidate.is_overridden };
     if (hasChanges) {
-      try { await fetch('http://localhost:8000/api/override',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({candidate_name:updated.candidate_name,override_reason:reason,new_total_score:total})}); } catch {}
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+      try { await fetch(`${API_BASE}/api/override`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({candidate_name:updated.candidate_name,override_reason:reason,new_total_score:total})}); } catch {}
     }
     onSave(updated);
   };
