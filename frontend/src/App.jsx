@@ -22,6 +22,7 @@ function App() {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '', finalResults = null;
+      
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -45,6 +46,17 @@ function App() {
           }
         }
       }
+      
+      if (buffer.trim()) {
+        try {
+          const ev = JSON.parse(buffer);
+          console.log('Final AI Event (from buffer):', ev);
+          if (ev.type === 'result') finalResults = ev.shortlist;
+        } catch (e) {
+          console.error('Failed to parse final buffer:', buffer, e);
+        }
+      }
+
       if (finalResults) {
         console.log('Switching to Results View...');
         setProgress(p => p ? { ...p, step: 'all_done' } : p);
@@ -54,8 +66,12 @@ function App() {
         console.warn('Evaluation finished but no results were received.');
       }
     } catch (err) {
+      console.error('Evaluation Error:', err);
       setError('Cannot reach backend. Make sure the FastAPI server is running on port 8000.');
-    } finally { setIsLoading(false); setProgress(null); }
+    } finally { 
+      setIsLoading(false); 
+      setProgress(null); 
+    }
   };
 
   const handleReset = () => { setResults(null); setError(null); setProgress(null); setCompletedFiles([]); setView('dashboard'); };
