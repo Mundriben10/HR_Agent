@@ -31,12 +31,12 @@ class CandidateEvaluation(BaseModel):
     total_score: float = Field(description="Weighted total score based on the rubric weights")
     recommendation: str = Field(description="'Hire', 'No-Hire', or 'Hold' recommendation")
 
-def get_llm(custom_api_key=None):
-    api_key = custom_api_key or os.environ.get("GEMINI_API_KEY")
-    if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable is not set and no custom key provided.")
+def get_llm(api_key: str = None):
+    resolved_key = api_key or os.environ.get("GEMINI_API_KEY")
+    if not resolved_key:
+        raise ValueError("GEMINI_API_KEY environment variable is not set.")
     # Using flash as it works reliably for all free tiers
-    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1)
+    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=resolved_key, temperature=0.1)
 
 def parse_jd(raw_jd_text: str, api_key: str = None) -> dict:
     """Step 1: Extract structured requirements from JD"""

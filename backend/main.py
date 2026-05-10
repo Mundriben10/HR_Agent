@@ -40,8 +40,9 @@ async def evaluate_candidates(
     if not resumes:
         raise HTTPException(status_code=400, detail="At least one file must be uploaded.")
 
-    if not api_key and not os.environ.get("GEMINI_API_KEY"):
-         return {"error": "GEMINI_API_KEY environment variable is not set and no custom key provided."}
+    resolved_api_key = api_key or os.environ.get("GEMINI_API_KEY")
+    if not resolved_api_key:
+         return {"error": "GEMINI_API_KEY environment variable is not set and no key was provided."}
 
     # Pre-read all files (needed before streaming generator)
     file_data = []
@@ -94,7 +95,7 @@ async def evaluate_candidates(
             }
             yield json.dumps(scoring_progress) + "\n"
 
-            evaluation = run_agent_flow(jd_text, resume_text, api_key)
+            evaluation = run_agent_flow(jd_text, resume_text, resolved_api_key)
             evaluation["candidate_name"] = filename
             results.append(evaluation)
 
