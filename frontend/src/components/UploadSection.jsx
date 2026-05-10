@@ -34,7 +34,7 @@ const ProgressView = ({ progress, completedFiles }) => {
             {progress ? `${progress.current} of ${progress.total}` : '...'} candidates
           </span>
         </div>
-        <div style={{ height: '10px', background: 'rgba(255,255,255,0.06)', borderRadius: '5px', overflow: 'hidden' }}>
+        <div style={{ height: '10px', background: 'var(--bg-tertiary)', borderRadius: '5px', overflow: 'hidden' }}>
           <div style={{
             height: '100%', width: `${pct}%`, borderRadius: '5px',
             background: allDone ? 'linear-gradient(90deg, var(--success), #34d399)' : 'linear-gradient(90deg, var(--accent), #a855f7)',
@@ -47,7 +47,7 @@ const ProgressView = ({ progress, completedFiles }) => {
       {/* Current file */}
       {progress && (
         <div className="animate-fade-in" style={{
-          background: 'rgba(0,0,0,0.25)', borderRadius: '12px', padding: '16px 20px',
+          background: 'var(--bg-tertiary)', borderRadius: '12px', padding: '16px 20px',
           border: '1px solid var(--border-subtle)', marginBottom: '24px',
           display: 'flex', alignItems: 'center', gap: '16px'
         }}>
@@ -149,7 +149,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <div key={tag} style={{
             fontSize: '0.75rem', fontWeight: 500, color: 'var(--text-secondary)',
             padding: '6px 14px', borderRadius: '20px',
-            border: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)'
+            border: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)'
           }}>
             {tag}
           </div>
@@ -187,7 +187,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               borderRadius: '12px',
               textAlign: 'center',
               cursor: 'pointer',
-              background: dragOver ? 'var(--accent-bg)' : resumes ? 'var(--accent-bg)' : 'rgba(0,0,0,0.2)',
+              background: dragOver ? 'var(--accent-bg)' : resumes ? 'var(--accent-bg)' : 'var(--bg-primary)',
               transition: 'all 0.3s ease'
             }}
           >

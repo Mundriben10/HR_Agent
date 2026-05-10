@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 
 /* ════════════ SCORE BAR ════════════ */
 const ScoreBar = ({ score, size = 'md' }) => {
@@ -11,7 +12,7 @@ const ScoreBar = ({ score, size = 'md' }) => {
   const h = size === 'sm' ? '4px' : '6px';
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
-      <div style={{ flex: 1, height: h, background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+      <div style={{ flex: 1, height: h, background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
         <div style={{ height: '100%', width: pct, background: color, borderRadius: '3px', transition: 'width 1.2s cubic-bezier(.4,0,.2,1)' }} />
       </div>
       <span style={{ fontSize: '0.8rem', fontWeight: 700, width: '32px', textAlign: 'right', color }}>{score}</span>
@@ -67,16 +68,16 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
   const weights = { skills_match: 0.3, experience_relevance: 0.25, education_certs: 0.15, project_portfolio: 0.2, communication_quality: 0.1 };
   const totalScore = calcTotal();
 
-  return (
+  const modalContent = (
     <div style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
+      position: 'fixed', inset: 0, zIndex: 9999,
       background: 'var(--bg-primary)',
       display: 'flex', flexDirection: 'column',
       overflow: 'hidden',
     }}>
       {/* Top bar */}
       <div style={{
-        background: 'rgba(12, 17, 25, 0.95)',
+        background: 'rgba(255, 255, 255, 0.95)',
         borderBottom: '1px solid var(--border-subtle)',
         flexShrink: 0,
         padding: '12px 32px',
@@ -104,11 +105,11 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
 
         {/* LEFT — Rubric cards */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {Object.entries(RUBRIC).map(([key, meta]) => {
             const orig = candidate[key] || { score: 0, justification: 'N/A' };
             return (
-              <div key={key} className="glass" style={{ padding: '14px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+              <div key={key} className="glass" style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
                     <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{meta.label}</span>
@@ -120,7 +121,7 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
                       onChange={e => handleScore(key, e.target.value)}
                       style={{
                         width: '46px', padding: '4px 6px', borderRadius: '6px', textAlign: 'center',
-                        background: 'rgba(0,0,0,0.4)', border: `1px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                        background: 'var(--bg-primary)', border: `1px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'var(--border-subtle)'}`,
                         color: scoreColor(edits[key]), fontFamily: 'Inter', fontWeight: 700, fontSize: '0.88rem', outline: 'none',
                       }}
                     />
@@ -152,7 +153,7 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
                   })}
                 </div>
 
-                <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: 1.45, fontStyle: 'italic', flex: 1 }}>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', marginTop: '6px', lineHeight: 1.4, fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   "{orig.justification}"
                 </p>
               </div>
@@ -161,13 +162,13 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
         </div>
 
         {/* RIGHT — Summary + Override */}
-        <div style={{ width: '340px', flexShrink: 0, borderLeft: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', background: 'rgba(12, 17, 25, 0.5)' }}>
+        <div style={{ width: '340px', flexShrink: 0, borderLeft: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', background: 'var(--bg-secondary)' }}>
 
           {/* Score ring */}
           <div style={{ padding: '28px 24px', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
             <div style={{
               width: 100, height: 100, borderRadius: '50%', margin: '0 auto 12px',
-              background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, rgba(255,255,255,0.06) 0)`,
+              background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, var(--bg-tertiary) 0)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <div style={{
@@ -220,6 +221,8 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(modalContent, document.body);
 };
 
 /* ════════════ RESULTS DASHBOARD ════════════ */
@@ -287,7 +290,7 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
         <div style={{
           display: 'grid', gridTemplateColumns: '48px 1fr 100px 140px 100px 100px',
           padding: '12px 24px', borderBottom: '1px solid var(--border-subtle)',
-          background: 'rgba(0,0,0,0.3)', fontSize: '0.7rem', fontWeight: 600,
+          background: 'var(--bg-tertiary)', fontSize: '0.7rem', fontWeight: 600,
           color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px'
         }}>
           <span>Rank</span><span>Candidate</span><span>Score</span><span style={{ textAlign: 'center' }}>Match</span><span style={{ textAlign: 'center' }}>Decision</span><span style={{ textAlign: 'right' }}>Action</span>
@@ -307,7 +310,7 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
                 transition: 'background 0.2s',
                 cursor: 'pointer'
               }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 onClick={() => setSelected(c)}
               >
@@ -342,7 +345,7 @@ const ResultsDashboard = ({ results: initialResults, onReset }) => {
 
                 {/* Bar */}
                 <div style={{ padding: '0 8px' }}>
-                  <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ height: '6px', background: 'var(--bg-tertiary)', borderRadius: '3px', overflow: 'hidden' }}>
                     <div style={{
                       height: '100%', width: `${pct}%`, borderRadius: '3px',
                       background: score >= 7 ? 'var(--success)' : score >= 4 ? 'var(--warning)' : 'var(--danger)',
