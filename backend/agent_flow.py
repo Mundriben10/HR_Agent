@@ -36,7 +36,7 @@ def get_llm():
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable is not set.")
     # Using flash as it works reliably for all free tiers
-    return ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1)
+    return ChatGoogleGenerativeAI(model="gemini-2.0-flash", google_api_key=api_key, temperature=0.1)
 
 def parse_jd(raw_jd_text: str) -> dict:
     """Step 1: Extract structured requirements from JD"""
