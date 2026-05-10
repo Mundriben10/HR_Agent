@@ -112,8 +112,8 @@ const Modal = ({ candidate, onClose, onSave }) => {
             </div>
           </div>
           <div style={{ display:'flex', gap:12 }}>
-            <button className="btn btn-ghost" onClick={onClose} style={{ borderRadius: '50px' }}>Cancel</button>
-            <button className="btn btn-primary" onClick={save} style={{ borderRadius: '50px' }}>Save Changes</button>
+            <button className="btn btn-ghost" onClick={onClose} style={{ borderRadius: '6px' }}>Cancel</button>
+            <button className="btn btn-primary" onClick={save} style={{ borderRadius: '6px' }}>Save Changes</button>
           </div>
         </div>
 
@@ -243,10 +243,10 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           </div>
         </div>
         <div style={{ display:'flex', gap:12 }}>
-          <button className="btn btn-ghost" onClick={onReset} style={{ borderRadius: '50px', padding: '10px 20px' }}>
+          <button className="btn btn-ghost" onClick={onReset} style={{ borderRadius: '6px', padding: '10px 20px' }}>
             <RotateCcw size={16} /> Start Over
           </button>
-          <button className="btn btn-primary" style={{ borderRadius: '50px', padding: '10px 24px' }}>
+          <button className="btn btn-primary" style={{ borderRadius: '6px', padding: '10px 24px' }}>
             Export Shortlist
           </button>
         </div>
@@ -298,7 +298,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
 
             <DimBars candidate={top} />
           </div>
-          <button className="btn btn-ghost" style={{ flexShrink:0, gap: '8px', borderRadius: '50px' }}>
+          <button className="btn btn-ghost" style={{ flexShrink:0, gap: '8px', borderRadius: '6px' }}>
             Inspect Profile <Search size={16} strokeWidth={1.5} />
           </button>
         </div>

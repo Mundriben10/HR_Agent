@@ -138,7 +138,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           className="btn btn-primary"
           onClick={() => onEvaluate(jdText, resumes)}
           disabled={!jdText.trim() || !resumes || isLoading}
-          style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '50px', height: 56, marginTop: 8 }}
+          style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '6px', height: 56, marginTop: 8 }}
         >
           {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
         </button>
