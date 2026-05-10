@@ -171,8 +171,8 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <div style={{ color: 'var(--ink-4)' }}><ShieldCheck size={20} strokeWidth={1.5} /></div>
           <div style={{ flex: 1 }}>
             <p className="label" style={{ marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
-              Gemini API Key (Required)
-              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--rose)' }}>Required to prevent developer cost</span>
+              Gemini API Key
+              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--ink-4)' }}>Required for secure, independent processing</span>
             </p>
             <div style={{ position: 'relative' }}>
               <input 
