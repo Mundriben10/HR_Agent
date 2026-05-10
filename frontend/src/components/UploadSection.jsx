@@ -1,116 +1,14 @@
 import React, { useState, useRef } from 'react';
 
-/* ════════════ REAL-TIME PROGRESS VIEW ════════════ */
-const ProgressView = ({ progress, completedFiles }) => {
-  const pct = progress ? Math.round(
-    (progress.step === 'all_done' ? 1 : ((completedFiles.length) / progress.total))
-  * 100) : 0;
-  const allDone = progress?.step === 'all_done';
-  const stepLabel = {
-    parsing: 'Extracting text',
-    scoring: 'AI scoring with rubric',
-    done: 'Complete',
-    all_done: 'Generating reports & ranking'
-  };
-
-  return (
-    <div className="glass animate-fade-up" style={{ maxWidth: '740px', margin: '60px auto 0', padding: '48px 40px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1.5px', color: allDone ? 'var(--success)' : 'var(--accent-light)', marginBottom: '8px' }}>
-          {allDone ? '✓ All Candidates Evaluated' : 'Agent Pipeline Active'}
-        </div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, letterSpacing: '-0.02em' }}>
-          {allDone ? 'Preparing Your Shortlist...' : 'Evaluating Your Candidates'}
-        </h2>
-      </div>
-
-      {/* Overall progress bar */}
-      <div style={{ marginBottom: '28px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            Overall Progress
-          </span>
-          <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--accent-light)' }}>
-            {progress ? `${progress.current} of ${progress.total}` : '...'} candidates
-          </span>
-        </div>
-        <div style={{ height: '10px', background: 'var(--bg-tertiary)', borderRadius: '5px', overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', width: `${pct}%`, borderRadius: '5px',
-            background: allDone ? 'linear-gradient(90deg, var(--success), #34d399)' : 'linear-gradient(90deg, var(--accent), #a855f7)',
-            transition: 'width 0.5s ease-out, background 0.5s ease',
-            boxShadow: allDone ? '0 0 12px rgba(16,185,129,0.35)' : '0 0 12px var(--accent-glow)'
-          }} />
-        </div>
-      </div>
-
-      {/* Current file */}
-      {progress && (
-        <div className="animate-fade-in" style={{
-          background: 'var(--bg-tertiary)', borderRadius: '12px', padding: '16px 20px',
-          border: '1px solid var(--border-subtle)', marginBottom: '24px',
-          display: 'flex', alignItems: 'center', gap: '16px'
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: '10px',
-            background: progress.step === 'done' ? 'var(--success)' : 'var(--accent)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0
-          }}>
-            {progress.step === 'done' ? (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            ) : (
-              <div className="spinner-ring" />
-            )}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontWeight: 600, fontSize: '0.9rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {progress.filename}
-            </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-              {stepLabel[progress.step] || progress.step}
-            </div>
-          </div>
-          <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-muted)', flexShrink: 0 }}>
-            Step {progress.current}/{progress.total}
-          </div>
-        </div>
-      )}
-
-      {/* Completed list */}
-      {completedFiles.length > 0 && (
-        <div>
-          <div style={{ fontSize: '0.72rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>
-            Completed ({completedFiles.length})
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {completedFiles.map((name, i) => (
-              <div key={i} style={{
-                display: 'flex', alignItems: 'center', gap: '10px',
-                fontSize: '0.82rem', color: 'var(--success)', opacity: 0.8,
-                animation: 'fadeUp 0.3s ease-out forwards'
-              }}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-/* ════════════ UPLOAD SECTION ════════════ */
 const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const [jdText, setJdText] = useState('');
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (jdText && resumes && resumes.length > 0) {
+    if (jdText && resumes) {
       onEvaluate(jdText, resumes);
     }
   };
@@ -118,57 +16,97 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+    if (e.dataTransfer.files.length > 0) {
       setResumes(e.dataTransfer.files);
     }
   };
 
-  // Show real-time progress when loading
-  if (isLoading) {
-    return <ProgressView progress={progress} completedFiles={completedFiles} />;
+  if (isLoading && progress) {
+    const totalProgress = (progress.current / progress.total) * 100;
+    return (
+      <div className="animate-fade-up" style={{ textAlign: 'center', padding: '80px 0', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ marginBottom: '50px' }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.05em' }}>
+            Neural Analysis<br /><span style={{ color: 'var(--accent)' }}>In Progress</span>
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginTop: '16px', fontWeight: 500 }}>
+            Processing Talent Pipeline...
+          </p>
+        </div>
+
+        <div className="glass" style={{ padding: '48px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px', fontWeight: 900, fontSize: '0.9rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <span>{progress.filename || 'Initializing...'}</span>
+            <span>{Math.round(totalProgress)}%</span>
+          </div>
+          
+          <div style={{ 
+            height: '16px', background: 'rgba(0,0,0,0.4)', borderRadius: '100px', overflow: 'hidden',
+            boxShadow: 'inset 2px 2px 6px rgba(0,0,0,0.8)'
+          }}>
+            <div style={{ 
+              height: '100%', width: `${totalProgress}%`, background: 'var(--accent)', borderRadius: '100px', 
+              transition: 'width 0.4s ease', boxShadow: '0 0 20px var(--accent-glow)'
+            }} />
+          </div>
+
+          <div style={{ marginTop: '40px', display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+            {completedFiles.map((name, i) => (
+              <div key={i} className="animate-fade-up" style={{ 
+                padding: '8px 16px', borderRadius: '10px', background: 'var(--success-bg)', color: 'var(--success)', 
+                fontSize: '0.75rem', fontWeight: 800, border: '1px solid rgba(0,255,170,0.2)' 
+              }}>
+                ✓ {name}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {progress.step === 'all_done' && (
+          <div className="animate-fade-up" style={{ marginTop: '40px', color: 'var(--success)', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Pipeline Synced Successfully
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
       {/* Header */}
-      <div className="animate-fade-up" style={{ marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-primary)', marginBottom: '12px' }}>
-          Evaluate Talent Pipeline
+      <div className="animate-fade-up" style={{ marginBottom: '60px' }}>
+        <h1 style={{ fontSize: '4.5rem', fontWeight: 900, letterSpacing: '-0.06em', color: '#fff', lineHeight: 0.85, textTransform: 'uppercase' }}>
+          Initialize<br /><span style={{ color: 'var(--accent)' }}>Evaluation</span>
         </h1>
-        <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: '640px', lineHeight: 1.6 }}>
-          Deploy advanced AI agents to analyze candidate profiles against your specific requirements. 
-          Receive transparent, multi-dimensional scoring in seconds.
+        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '700px', marginTop: '24px', fontWeight: 500, lineHeight: 1.5 }}>
+          Deploy advanced neural agents to filter through your talent pool with 5-dimensional rubric precision.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="stagger" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+      <form onSubmit={handleSubmit} className="stagger" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
         {/* Left: JD */}
-        <div className="glass" style={{ padding: '24px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <div style={{ width: 32, height: 32, borderRadius: '8px', background: 'var(--accent-bg)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Job Description</h3>
+        <div className="glass" style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ width: 44, height: 44, borderRadius: '12px', background: '#fff', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>01</div>
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Job Parameters</h3>
           </div>
           <textarea
             className="input-field"
             value={jdText}
             onChange={(e) => setJdText(e.target.value)}
-            placeholder="Paste your role requirements here..."
+            placeholder="PASTE JOB DESCRIPTION HERE..."
             required
-            rows={12}
+            rows={14}
             style={{ flex: 1, resize: 'none' }}
           />
         </div>
 
         {/* Right: Files */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div className="glass" style={{ padding: '24px', flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-              <div style={{ width: 32, height: 32, borderRadius: '8px', background: 'var(--success-bg)', color: 'var(--success)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Candidate Profiles</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
+          <div className="glass" style={{ padding: '32px', flex: 1, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--accent)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: '1.2rem' }}>02</div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Talent Source</h3>
             </div>
             
             <div
@@ -177,18 +115,19 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               style={{
-                height: 'calc(100% - 48px)',
-                border: `2px dashed ${dragOver ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                borderRadius: '16px',
+                flex: 1,
+                border: `2px dashed ${dragOver ? 'var(--accent)' : 'rgba(255,255,255,0.05)'}`,
+                borderRadius: '24px',
                 textAlign: 'center',
                 cursor: 'pointer',
-                background: dragOver ? 'var(--accent-bg)' : resumes ? 'var(--accent-bg)' : 'var(--bg-primary)',
+                background: dragOver ? 'rgba(0,242,255,0.02)' : 'rgba(0,0,0,0.3)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'all 0.3s ease',
-                padding: '24px'
+                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                padding: '40px',
+                boxShadow: 'inset 4px 4px 15px rgba(0,0,0,0.5)'
               }}
             >
               <input
@@ -200,29 +139,23 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               />
               {resumes ? (
                 <div className="animate-fade-in">
-                  <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>📄</div>
-                  <p style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '1.1rem' }}>
-                    {resumes.length} Document{resumes.length !== 1 ? 's' : ''}
+                  <div style={{ fontSize: '4rem', marginBottom: '20px' }}>📄</div>
+                  <p style={{ fontWeight: 900, color: 'var(--accent)', fontSize: '1.4rem', textTransform: 'uppercase' }}>
+                    {resumes.length} Profiles Ready
                   </p>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px', maxWidth: '300px', wordBreak: 'break-all' }}>
-                    {Array.from(resumes).slice(0, 3).map(f => f.name).join(', ')}
-                    {resumes.length > 3 ? ` and ${resumes.length - 3} more...` : ''}
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '12px', maxWidth: '350px', fontWeight: 600 }}>
+                    PIPELINE INITIALIZED FOR {Array.from(resumes).length} DOCUMENTS
                   </p>
                 </div>
               ) : (
                 <div className="animate-fade-in">
-                  <div style={{ fontSize: '2.5rem', marginBottom: '12px', opacity: 0.3 }}>📥</div>
-                  <p style={{ color: 'var(--text-secondary)', fontWeight: 700, fontSize: '1.1rem' }}>
+                  <div style={{ fontSize: '4rem', marginBottom: '20px', opacity: 0.1 }}>📥</div>
+                  <p style={{ color: '#fff', fontWeight: 900, fontSize: '1.4rem', textTransform: 'uppercase' }}>
                     Upload Resumes
                   </p>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '8px' }}>
-                    Drag & Drop or <span style={{ color: 'var(--accent)', textDecoration: 'underline' }}>Browse Files</span>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '12px', fontWeight: 600 }}>
+                    DRAG & DROP OR <span style={{ color: 'var(--accent)', textDecoration: 'underline' }}>BROWSE REPOSITORY</span>
                   </p>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '20px', justifyContent: 'center' }}>
-                    {['PDF', 'DOCX', 'JSON'].map(t => (
-                      <span key={t} style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-muted)', background: 'var(--bg-tertiary)', padding: '4px 8px', borderRadius: '4px' }}>{t}</span>
-                    ))}
-                  </div>
                 </div>
               )}
             </div>
@@ -231,10 +164,9 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           <button
             type="submit" className="btn btn-primary"
             disabled={isLoading || !jdText || !resumes}
-            style={{ width: '100%', padding: '20px', fontSize: '1.1rem', justifyContent: 'center' }}
+            style={{ width: '100%', padding: '24px', fontSize: '1.2rem', justifyContent: 'center' }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Start Intelligence Pipeline
+            EXECUTE NEURAL LOOP
           </button>
         </div>
       </form>
