@@ -16,22 +16,38 @@ const AVATAR_PALETTES = [
   ['#d1fae5','#065f46'],['#fef3c7','#92400e'],['#fee2e2','#991b1b'],
 ];
 
-const sc = s => s >= 8 ? 'var(--emerald)' : s >= 5 ? 'var(--amber)' : 'var(--rose)';
+const sc = s => s > 7.5 ? 'var(--emerald)' : s >= 4 ? 'var(--amber)' : 'var(--rose)';
 const rc = r => r === 'Hire' ? 'hire' : r === 'No-Hire' ? 'nohire' : 'hold';
 
+/* ── CATEGORY HELPER ── */
+const getCategory = s => s > 7.5 ? 'Excellent' : s >= 4 ? 'Average' : 'Poor';
+const getCatColor = s => s > 7.5 ? 'var(--emerald)' : s >= 4 ? 'var(--amber)' : 'var(--rose)';
+
 /* ── MINI DIMENSION BARS (inside card) ── */
-const DimBars = ({ candidate, isDark }) => (
-  <div style={{ display:'flex', flexDirection:'column', gap:5 }}>
+const DimBars = ({ candidate }) => (
+  <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
     {Object.entries(DIM).map(([k, m]) => {
       const s = candidate[k]?.score ?? 0;
+      const weight = Math.round(W[k] * 100);
+      const category = getCategory(s);
+      const color = getCatColor(s);
+      
       return (
-        <div key={k} style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ color: isDark ? 'rgba(255,255,255,.45)' : 'var(--ink-4)', display: 'flex' }}>{m.icon}</div>
-          <span style={{ fontSize:'.65rem', color: isDark ? 'rgba(255,255,255,.45)' : 'var(--ink-4)', width:66, flexShrink:0 }}>{m.label}</span>
-          <div className="mini-bar" style={{ flex:1, background: isDark ? 'rgba(255,255,255,.1)' : 'var(--sand-100)' }}>
-            <div className="mini-bar-fill" style={{ width:`${s*10}%`, background: sc(s) }} />
+        <div key={k} style={{ display:'flex', flexDirection: 'column', gap:6 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ color: 'var(--ink-4)', display: 'flex' }}>{m.icon}</span>
+              <span style={{ fontSize:'.75rem', fontWeight: 600, color: 'var(--ink-2)' }}>
+                {m.label} <span style={{ color: 'var(--ink-4)', fontWeight: 500 }}>({weight}%)</span>
+              </span>
+            </div>
+            <span style={{ fontSize:'.7rem', fontWeight:800, color, padding: '2px 8px', borderRadius: 6, background: `${color}15` }}>
+              {category} · {s}/10
+            </span>
           </div>
-          <span style={{ fontSize:'.65rem', fontWeight:700, color: isDark ? 'rgba(255,255,255,.7)' : 'var(--ink-3)', width:16, textAlign:'right' }}>{s}</span>
+          <div className="mini-bar" style={{ flex:1, background: 'var(--sand-100)' }}>
+            <div className="mini-bar-fill" style={{ width:`${s*10}%`, background: color }} />
+          </div>
         </div>
       );
     })}
@@ -39,20 +55,20 @@ const DimBars = ({ candidate, isDark }) => (
 );
 
 /* ── SCORE RING ── */
-const Ring = ({ score, size=90, isDark }) => {
+const Ring = ({ score, size=90 }) => {
   const color = sc(score);
   return (
     <div className="score-ring" style={{
       width:size, height:size,
-      background:`conic-gradient(${color} ${score*10}%, ${isDark?'rgba(255,255,255,.07)':'var(--sand-100)'} 0)`,
+      background:`conic-gradient(${color} ${score*10}%, var(--sand-100) 0)`,
       borderRadius:'50%'
     }}>
       <div className="score-ring-inner" style={{
         width:size-14, height:size-14,
-        background: isDark ? '#1e1a2e' : '#fff'
+        background: '#fff'
       }}>
         <span style={{ fontSize: size<80?'1.1rem':'1.4rem', fontWeight:900, color, letterSpacing:'-.03em', lineHeight:1 }}>{score.toFixed(1)}</span>
-        <span style={{ fontSize:'.55rem', color: isDark?'rgba(255,255,255,.4)':'var(--ink-4)', fontWeight:700, marginTop:1 }}>/ 10</span>
+        <span style={{ fontSize:'.55rem', color: 'var(--ink-4)', fontWeight:700, marginTop:1 }}>/ 10</span>
       </div>
     </div>
   );
@@ -101,36 +117,44 @@ const Modal = ({ candidate, onClose, onSave }) => {
         </div>
 
         {/* Body */}
-        <div style={{ display:'flex', flex:1, overflow:'hidden' }}>
+        <div style={{ display:'flex', flex:1, overflow:'hidden', background: '#fff' }}>
           {/* Rubric list */}
-          <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:12, background:'var(--sand-50)' }}>
+          <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:16 }}>
             <p className="label">Scoring Dimensions</p>
             {Object.entries(DIM).map(([k,m]) => {
               const orig = candidate[k] || {};
               const changed = edits[k] !== (orig.score||0);
+              const category = getCategory(edits[k]);
+              const color = getCatColor(edits[k]);
+              
               return (
-                <div key={k} className="card" style={{ padding:'14px 18px' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                <div key={k} className="card" style={{ padding:'16px 20px', borderLeft: changed ? `3px solid var(--violet)` : `1px solid var(--sand-200)` }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                      <div style={{ color: 'var(--violet)' }}>{m.icon}</div>
-                      <span style={{ fontWeight:600, fontSize:'.875rem' }}>{m.label}</span>
-                      <span style={{ fontSize:'.7rem', padding:'2px 7px', borderRadius:20, background:'var(--sand-100)', color:'var(--ink-4)', fontWeight:700 }}>
+                      <div style={{ color: 'var(--ink-4)' }}>{m.icon}</div>
+                      <span style={{ fontWeight:700, fontSize:'.9rem', color: 'var(--ink-2)' }}>{m.label}</span>
+                      <span style={{ fontSize:'.7rem', padding:'2px 8px', borderRadius:20, background:'var(--sand-100)', color:'var(--ink-4)', fontWeight:700 }}>
                         {Math.round(W[k]*100)}%
                       </span>
                     </div>
-                    <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <input type="number" min="0" max="10" value={edits[k]}
-                        onChange={e=>setEdits(p=>({...p,[k]:Math.max(0,Math.min(10,+e.target.value))}))}
-                        style={{ width:48, padding:'5px 8px', textAlign:'center', fontWeight:800, fontSize:'.95rem',
-                          border:`1.5px solid ${changed?'var(--violet)':'var(--sand-200)'}`,
-                          borderRadius:8, background:changed?'var(--violet-bg)':'#fff',
-                          color:sc(edits[k]), outline:'none', fontFamily:'inherit' }}
-                      />
-                      <span style={{ fontSize:'.75rem', color:'var(--ink-4)' }}>/10</span>
+                    <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+                      <span style={{ fontSize:'.75rem', fontWeight: 800, color, padding: '4px 10px', borderRadius: 6, background: `${color}15` }}>
+                        {category}
+                      </span>
+                      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                        <input type="number" min="0" max="10" value={edits[k]}
+                          onChange={e=>setEdits(p=>({...p,[k]:Math.max(0,Math.min(10,+e.target.value))}))}
+                          style={{ width:54, padding:'6px 8px', textAlign:'center', fontWeight:800, fontSize:'.95rem',
+                            border:`1.5px solid ${changed?'var(--violet)':'var(--sand-200)'}`,
+                            borderRadius:8, background:changed?'var(--violet-bg)':'#fff',
+                            color, outline:'none', fontFamily:'inherit' }}
+                        />
+                        <span style={{ fontSize:'.75rem', color:'var(--ink-4)' }}>/10</span>
+                      </div>
                     </div>
                   </div>
-                  <div style={{ height:5, background:'var(--sand-100)', borderRadius:100, overflow:'hidden', marginBottom:10 }}>
-                    <div style={{ height:'100%', width:`${edits[k]*10}%`, background:sc(edits[k]), borderRadius:100, transition:'width .5s' }} />
+                  <div style={{ height:6, background:'var(--sand-100)', borderRadius:100, overflow:'hidden', marginBottom:12 }}>
+                    <div style={{ height:'100%', width:`${edits[k]*10}%`, background:color, borderRadius:100, transition:'width .3s, background .3s' }} />
                   </div>
                   {orig.justification && (
                     <p style={{ fontSize:'.78rem', color:'var(--ink-3)', lineHeight:1.55, paddingLeft:10, borderLeft:'2px solid var(--sand-200)' }}>
@@ -228,23 +252,23 @@ const ResultsDashboard = ({ results: init, onReset }) => {
 
       {/* TOP CANDIDATE — big feature card */}
       {top && (
-        <div className="candidate-card top-card fade-up" style={{ marginBottom:20, flexDirection:'row', alignItems:'center', gap:28, padding:'28px 32px' }} onClick={()=>setSelected(top)}>
+        <div className="candidate-card fade-up" style={{ marginBottom:20, flexDirection:'row', alignItems:'center', gap:28, padding:'28px 32px', borderColor: 'var(--violet)', boxShadow: '0 0 0 1px rgba(74,158,114,.15), var(--shadow-2)' }} onClick={()=>setSelected(top)}>
           <div style={{ position:'relative', flexShrink:0 }}>
-            <Ring score={top.total_score||0} size={110} isDark />
+            <Ring score={top.total_score||0} size={110} />
             <div style={{ position:'absolute', top:-6, left:-6, background:'#fbbf24', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', color: '#b45309', boxShadow:'0 2px 8px rgba(0,0,0,.2)' }}>
               <Trophy size={14} strokeWidth={2.5} />
             </div>
           </div>
           <div style={{ flex:1 }}>
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
-              <h2 style={{ fontSize:'1.5rem', fontWeight:800, letterSpacing:'-.025em', color:'#fff' }}>{top.candidate_name}</h2>
-              <span className={`tag tag-${rc(top.recommendation)}`} style={{ background:'rgba(255,255,255,.1)', color:'#fff', border:'1px solid rgba(255,255,255,.15)' }}>{top.recommendation}</span>
-              {top.is_overridden && <span className="tag" style={{ background:'rgba(91,76,219,.3)', color:'#c4bbff' }}>Edited</span>}
+              <h2 style={{ fontSize:'1.5rem', fontWeight:800, letterSpacing:'-.025em', color:'var(--ink-2)' }}>{top.candidate_name}</h2>
+              <span className={`tag tag-${rc(top.recommendation)}`}>{top.recommendation}</span>
+              {top.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
             </div>
-            <p style={{ fontSize:'.85rem', color:'rgba(255,255,255,.5)', marginBottom:16 }}>Ranked #1 out of {candidates.length} candidates · Highest match score</p>
-            <DimBars candidate={top} isDark />
+            <p style={{ fontSize:'.85rem', color:'var(--ink-3)', marginBottom:16 }}>Ranked #1 out of {candidates.length} candidates · Highest match score</p>
+            <DimBars candidate={top} />
           </div>
-          <button className="btn" style={{ background:'rgba(255,255,255,.12)', color:'#fff', border:'1px solid rgba(255,255,255,.15)', flexShrink:0, gap: '8px' }}>
+          <button className="btn btn-ghost" style={{ flexShrink:0, gap: '8px' }}>
             Inspect Profile <Search size={16} strokeWidth={1.5} />
           </button>
         </div>
@@ -279,7 +303,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
               <div style={{ display:'flex', alignItems:'center', gap:14 }}>
                 <Ring score={score} size={70} />
                 <div style={{ flex:1 }}>
-                  <DimBars candidate={c} isDark={false} />
+                  <DimBars candidate={c} />
                 </div>
               </div>
 
