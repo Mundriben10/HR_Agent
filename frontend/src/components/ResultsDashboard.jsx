@@ -64,125 +64,157 @@ const CandidateModal = ({ candidate, onClose, onSave }) => {
   };
 
   const scoreColor = (s) => s >= 8 ? 'var(--success)' : s >= 5 ? 'var(--warning)' : 'var(--danger)';
+  const weights = { skills_match: 0.3, experience_relevance: 0.25, education_certs: 0.15, project_portfolio: 0.2, communication_quality: 0.1 };
+  const totalScore = calcTotal();
 
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)',
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', zIndex: 1000,
-      overflowY: 'auto', padding: '48px 16px'
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 1000,
+      background: 'var(--bg-primary)',
+      display: 'flex', flexDirection: 'column',
+      overflow: 'hidden',
     }}>
-      <div onClick={e => e.stopPropagation()} className="glass-strong animate-fade-up" style={{
-        width: '100%', maxWidth: '860px', padding: '0', overflow: 'hidden'
+      {/* Top bar */}
+      <div style={{
+        background: 'rgba(12, 17, 25, 0.95)',
+        borderBottom: '1px solid var(--border-subtle)',
+        flexShrink: 0,
+        padding: '12px 32px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
       }}>
-        {/* Header */}
-        <div style={{ padding: '28px 32px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.02em', marginBottom: '4px' }}>{candidate.candidate_name}</h2>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span className={`tag tag-${candidate.recommendation === 'Hire' ? 'hire' : candidate.recommendation === 'No-Hire' ? 'nohire' : 'hold'}`}>
-                {candidate.recommendation}
-              </span>
-              {candidate.is_overridden && <span className="tag tag-override">HR Edited</span>}
-            </div>
-          </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Weighted Total</div>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--accent-light)', letterSpacing: '-0.03em' }}>
-              {calcTotal().toFixed(1)}<span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: 400 }}>/10</span>
-            </div>
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={onClose} className="btn btn-ghost" style={{ padding: '6px 10px', fontSize: '0.78rem' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back to List
+          </button>
+          <div style={{ width: '1px', height: '24px', background: 'var(--border-subtle)' }} />
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '-0.02em' }}>{candidate.candidate_name}</h2>
+          <span className={`tag tag-${candidate.recommendation === 'Hire' ? 'hire' : candidate.recommendation === 'No-Hire' ? 'nohire' : 'hold'}`}>
+            {candidate.recommendation}
+          </span>
+          {candidate.is_overridden && <span className="tag tag-override">HR Edited</span>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button onClick={onClose} className="btn btn-ghost" style={{ padding: '8px 16px' }}>Cancel</button>
+          <button onClick={handleSave} className="btn btn-primary" style={{ padding: '8px 20px' }}>Save Changes</button>
+        </div>
+      </div>
+
+      {/* Split panel */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+
+        {/* LEFT — Rubric cards */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {Object.entries(RUBRIC).map(([key, meta]) => {
+            const orig = candidate[key] || { score: 0, justification: 'N/A' };
+            return (
+              <div key={key} className="glass" style={{ padding: '14px 18px', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.88rem' }}>{meta.label}</span>
+                    <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>Weight: {meta.weight}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <input
+                      type="number" min="0" max="10" value={edits[key]}
+                      onChange={e => handleScore(key, e.target.value)}
+                      style={{
+                        width: '46px', padding: '4px 6px', borderRadius: '6px', textAlign: 'center',
+                        background: 'rgba(0,0,0,0.4)', border: `1px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'var(--border-subtle)'}`,
+                        color: scoreColor(edits[key]), fontFamily: 'Inter', fontWeight: 700, fontSize: '0.88rem', outline: 'none',
+                      }}
+                    />
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>/10</span>
+                  </div>
+                </div>
+                <ScoreBar score={edits[key]} size="sm" />
+
+                {/* Rubric ranges */}
+                <div style={{ display: 'flex', gap: '4px', marginTop: '8px' }}>
+                  {[
+                    { l: '0 – Poor', v: meta.poor, min: 0, max: 3, color: 'var(--danger)', bg: 'var(--danger-bg)', border: 'rgba(239,68,68,0.3)' },
+                    { l: '5 – Avg', v: meta.avg, min: 4, max: 7, color: 'var(--warning)', bg: 'var(--warning-bg)', border: 'rgba(245,158,11,0.3)' },
+                    { l: '10 – Exc', v: meta.exc, min: 8, max: 10, color: 'var(--success)', bg: 'var(--success-bg)', border: 'rgba(16,185,129,0.3)' }
+                  ].map(c => {
+                    const isActive = edits[key] >= c.min && edits[key] <= c.max;
+                    return (
+                      <div key={c.l} style={{
+                        fontSize: '0.62rem', padding: '3px 6px', borderRadius: '4px', flex: 1, textAlign: 'center',
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? c.color : 'var(--text-muted)',
+                        background: isActive ? c.bg : 'transparent',
+                        border: `1px solid ${isActive ? c.border : 'var(--border-subtle)'}`,
+                        transition: 'all 0.3s ease',
+                      }}>
+                        {c.l}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginTop: '8px', lineHeight: 1.45, fontStyle: 'italic', flex: 1 }}>
+                  "{orig.justification}"
+                </p>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Rubric Table */}
-        <div style={{ padding: '24px 32px' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>
-            Transparent Scoring Rubric
+        {/* RIGHT — Summary + Override */}
+        <div style={{ width: '340px', flexShrink: 0, borderLeft: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', background: 'rgba(12, 17, 25, 0.5)' }}>
+
+          {/* Score ring */}
+          <div style={{ padding: '28px 24px', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
+            <div style={{
+              width: 100, height: 100, borderRadius: '50%', margin: '0 auto 12px',
+              background: `conic-gradient(${scoreColor(totalScore)} ${totalScore * 10}%, rgba(255,255,255,0.06) 0)`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <div style={{
+                width: 78, height: 78, borderRadius: '50%', background: 'var(--bg-primary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
+              }}>
+                <span style={{ fontSize: '1.6rem', fontWeight: 800, color: scoreColor(totalScore), letterSpacing: '-0.03em' }}>{totalScore.toFixed(1)}</span>
+                <span style={{ fontSize: '0.6rem', color: 'var(--text-muted)', fontWeight: 500 }}>out of 10</span>
+              </div>
+            </div>
+            <div style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Weighted Total Score</div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {/* Dimension breakdown */}
+          <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-subtle)', flex: 1, overflowY: 'auto' }}>
+            <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Contribution Breakdown</div>
             {Object.entries(RUBRIC).map(([key, meta]) => {
-              const orig = candidate[key] || { score: 0, justification: 'N/A' };
+              const contribution = (edits[key] * weights[key]).toFixed(1);
               return (
-                <div key={key} style={{
-                  background: 'rgba(0,0,0,0.2)', borderRadius: '12px', padding: '16px 20px',
-                  border: '1px solid var(--border-subtle)'
-                }}>
-                  {/* Top row: label + weight + score input */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{meta.label}</span>
-                      <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>({meta.weight})</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <input
-                        type="number" min="0" max="10" value={edits[key]}
-                        onChange={e => handleScore(key, e.target.value)}
-                        style={{
-                          width: '52px', padding: '5px 8px', borderRadius: '8px', textAlign: 'center',
-                          background: 'rgba(0,0,0,0.4)', border: `1px solid ${edits[key] !== orig.score ? 'var(--accent)' : 'var(--border-subtle)'}`,
-                          color: scoreColor(edits[key]), fontFamily: 'Inter', fontWeight: 700, fontSize: '0.9rem', outline: 'none',
-                        }}
-                      />
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>/10</span>
-                    </div>
+                <div key={key} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+                  <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>{meta.label}</span>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: scoreColor(edits[key]) }}>{edits[key]}</span>
+                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>× {meta.weight}</span>
+                    <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)' }}>=</span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-primary)' }}>{contribution}</span>
                   </div>
-                  <ScoreBar score={edits[key]} size="sm" />
-
-                  {/* Rubric criteria — active range highlighted */}
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
-                    {[
-                      { l: '0 – Poor', v: meta.poor, min: 0, max: 3, color: 'var(--danger)', bg: 'var(--danger-bg)', border: 'rgba(239,68,68,0.3)' },
-                      { l: '5 – Average', v: meta.avg, min: 4, max: 7, color: 'var(--warning)', bg: 'var(--warning-bg)', border: 'rgba(245,158,11,0.3)' },
-                      { l: '10 – Excellent', v: meta.exc, min: 8, max: 10, color: 'var(--success)', bg: 'var(--success-bg)', border: 'rgba(16,185,129,0.3)' }
-                    ].map(c => {
-                      const isActive = edits[key] >= c.min && edits[key] <= c.max;
-                      return (
-                        <div key={c.l} style={{
-                          fontSize: '0.7rem', padding: '4px 10px', borderRadius: '6px', flex: 1, minWidth: '120px',
-                          color: isActive ? c.color : 'var(--text-muted)',
-                          background: isActive ? c.bg : 'rgba(255,255,255,0.03)',
-                          border: `1px solid ${isActive ? c.border : 'var(--border-subtle)'}`,
-                          transition: 'all 0.3s ease',
-                          boxShadow: isActive ? `0 0 8px ${c.border}` : 'none'
-                        }}>
-                          <span style={{ fontWeight: 700 }}>{c.l}</span><br />
-                          <span style={{ opacity: 0.85 }}>{c.v}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Justification */}
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginTop: '10px', lineHeight: 1.5, fontStyle: 'italic' }}>
-                    "{orig.justification}"
-                  </p>
                 </div>
               );
             })}
           </div>
-        </div>
 
-        {/* Override */}
-        <div style={{ padding: '0 32px 28px' }}>
-          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px' }}>
+          {/* HR Override */}
+          <div style={{ padding: '16px 24px', flexShrink: 0 }}>
             <label style={{
-              display: 'block', marginBottom: '8px', fontWeight: 600, fontSize: '0.85rem',
+              display: 'block', marginBottom: '6px', fontWeight: 600, fontSize: '0.78rem',
               color: hasChanges ? 'var(--warning)' : 'var(--text-primary)'
             }}>
-              HR Override Reason {hasChanges && <span style={{ fontWeight: 400, fontSize: '0.75rem' }}>(required)</span>}
+              HR Override Reason {hasChanges && <span style={{ fontWeight: 400, fontSize: '0.68rem' }}>(required)</span>}
             </label>
             <textarea
               className="input-field"
               value={reason} onChange={e => setReason(e.target.value)}
-              placeholder="If you changed any scores, explain your rationale here..."
-              rows={2}
-              style={{ borderColor: hasChanges && !reason ? 'var(--danger)' : undefined }}
+              placeholder="Explain your rationale..."
+              rows={3}
+              style={{ borderColor: hasChanges && !reason ? 'var(--danger)' : undefined, padding: '10px 12px', fontSize: '0.82rem' }}
             />
-          </div>
-
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
-            <button onClick={onClose} className="btn btn-ghost">Cancel</button>
-            <button onClick={handleSave} className="btn btn-primary">Save Changes</button>
           </div>
         </div>
       </div>
