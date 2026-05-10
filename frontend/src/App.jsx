@@ -20,7 +20,10 @@ function App() {
     const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
     try {
       const response = await fetch(`${API_BASE}/api/evaluate`, { method: 'POST', body: formData });
-      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || `Server error: ${response.status}`);
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '', finalResults = null;

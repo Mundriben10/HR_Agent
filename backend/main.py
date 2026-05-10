@@ -42,7 +42,7 @@ async def evaluate_candidates(
 
     resolved_api_key = api_key or os.environ.get("GEMINI_API_KEY")
     if not resolved_api_key:
-         return {"error": "GEMINI_API_KEY environment variable is not set and no key was provided."}
+         raise HTTPException(status_code=401, detail="Gemini API Key is missing. Please provide it in the UI or set it as an environment variable.")
 
     # Pre-read all files (needed before streaming generator)
     file_data = []
