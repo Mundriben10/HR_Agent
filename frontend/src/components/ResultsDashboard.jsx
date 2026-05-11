@@ -176,9 +176,24 @@ const Modal = ({ candidate, onClose, onSave }) => {
               ))}
             </div>
             {hasChanges && (
+              <div style={{ padding:'14px 20px', background:'var(--amber-bg)', borderTop:'1px solid var(--amber)', borderRadius:'0 0 20px 0' }}>
+                <p style={{ fontSize:'.75rem', fontWeight:700, color:'var(--amber)', marginBottom:8, display:'flex', alignItems:'center', gap:6 }}>
+                  <MessageSquare size={14} /> Audit Justification Required *
+                </p>
+                <textarea 
+                  className="input-field" 
+                  value={reason} 
+                  onChange={e=>setReason(e.target.value)} 
+                  placeholder="Explain why you are overriding the AI's assessment..." 
+                  rows={3} 
+                  style={{ fontSize:'.82rem', borderColor:'var(--amber)' }} 
+                />
+              </div>
+            )}
+            {candidate.is_overridden && !hasChanges && (
               <div style={{ padding:'14px 20px', background:'var(--sand-50)', borderTop:'1px solid var(--sand-200)' }}>
-                <p style={{ fontSize:'.75rem', fontWeight:700, color:'var(--amber)', marginBottom:8 }}>Override reason *</p>
-                <textarea className="input-field" value={reason} onChange={e=>setReason(e.target.value)} placeholder="Why are you adjusting scores?" rows={3} style={{ fontSize:'.82rem' }} />
+                <p style={{ fontSize:'.75rem', fontWeight:700, color:'var(--ink-4)', marginBottom:4 }}>Previous Override Note:</p>
+                <p style={{ fontSize:'.82rem', color:'var(--ink-3)', fontStyle:'italic' }}>"{candidate.override_reason}"</p>
               </div>
             )}
           </div>
