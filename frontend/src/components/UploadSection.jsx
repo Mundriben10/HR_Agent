@@ -16,14 +16,10 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
   const total = progress?.total || (resumes?.length ?? 1);
   const basePct = isWarmingUp ? 5 : Math.min(Math.round(((Math.max(current, 1) - 1) / total) * 100 + (100 / total) * 0.5), 99);
 
-  // Sync displayPct if basePct jumps higher (e.g. new file finishes)
   useEffect(() => {
-    if (isLoading) {
-      setDisplayPct(prev => Math.max(prev, basePct));
-    }
+    if (isLoading) setDisplayPct(prev => Math.max(prev, basePct));
   }, [basePct, isLoading]);
 
-  // Tick the displayPct upwards slowly
   useEffect(() => {
     let interval;
     if (isLoading) {
@@ -41,26 +37,26 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
     return () => clearInterval(interval);
   }, [isLoading]);
 
-  const handleDrop = (e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files.length) setResumes(e.dataTransfer.files); };
+  const handleDrop = (e) => {
+    e.preventDefault(); setDragOver(false);
+    if (e.dataTransfer.files.length) setResumes(e.dataTransfer.files);
+  };
 
-  /* Loading screen */
+  /* ── Loading Screen ── */
   if (isLoading) {
     const filename = progress?.filename || 'Initializing AI model...';
-    
     return (
-      <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', textAlign: 'center' }}>
         <div style={{ position: 'relative', width: 64, height: 64, margin: '0 auto 24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="spinner" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderWidth: 2, borderTopColor: 'var(--violet)', borderRightColor: 'var(--violet)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', animationDuration: '1.2s' }} />
+          <div className="spinner spinner-lg" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderTopColor: 'var(--violet)', borderRightColor: 'var(--violet)', borderBottomColor: 'var(--sand-200)', borderLeftColor: 'var(--sand-200)', animationDuration: '1.2s' }} />
           <span style={{ fontSize: '.85rem', fontWeight: 600, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>
             {isWarmingUp ? '...' : `${displayPct}%`}
           </span>
         </div>
         <h2 className="serif-heading" style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--ink)', marginBottom: 12 }}>Analyzing Talent</h2>
-        
-        <div style={{ color: 'var(--ink-4)', fontSize: '.95rem', marginBottom: 32, fontFamily: 'Georgia, serif', fontStyle: 'italic', letterSpacing: '0.01em' }}>
+        <div style={{ color: 'var(--ink-4)', fontSize: '.95rem', marginBottom: 32, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
           {isWarmingUp ? 'Connecting to secure AI environment...' : `Evaluating ${current} of ${total}: ${filename}`}
         </div>
-
         {completedFiles.length > 0 && (
           <div className="stagger" style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 360 }}>
             {completedFiles.map((n, i) => (
@@ -77,25 +73,26 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+
       {/* ── Hero ── */}
-      <div className="fade-up" style={{ marginBottom: 32 }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, border: '1px solid var(--sand-200)', marginBottom: 24, background: '#fff' }}>
+      <div className="upload-hero fade-up">
+        <div className="upload-badge">
           <ShieldCheck size={14} color="var(--violet)" strokeWidth={1.5} />
-          <span style={{ fontSize: '.75rem', fontWeight: 500, color: 'var(--ink-2)', letterSpacing: '.04em' }}>ENTERPRISE AI ANALYSIS</span>
+          <span>ENTERPRISE AI ANALYSIS</span>
         </div>
-        <h1 className="serif-heading" style={{ fontSize: '3rem', lineHeight: 1.1, marginBottom: 16 }}>
+        <h1 className="serif-heading upload-title">
           Find your next <span style={{ color: 'var(--violet)' }}>top candidate.</span>
         </h1>
-        <p style={{ fontSize: '1.05rem', color: 'var(--ink-3)', maxWidth: 500, lineHeight: 1.65, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+        <p className="upload-subtitle">
           Paste a job description, upload resumes, and receive a ranked shortlist with transparent AI scoring.
         </p>
       </div>
 
-      {/* ── Bento Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+      {/* ── Main Grid ── */}
+      <div className="upload-grid">
 
         {/* JD Card */}
-        <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 16, gridRow: 'span 2', background: '#fff', border: `1px solid ${jdFocused ? 'var(--violet)' : 'var(--sand-200)'}`, borderRadius: '16px', transition: 'border-color 0.2s' }}>
+        <div className={`jd-card ${jdFocused ? 'focused' : ''}`}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--sand-50)', border: '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-2)' }}>
@@ -103,7 +100,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
               </div>
               <h3 className="serif-heading" style={{ fontSize: '1.25rem' }}>Job Description</h3>
             </div>
-            <span className="label" style={{ fontWeight: 500 }}>{jdText.trim().split(/\s+/).filter(Boolean).length || 0} words</span>
+            <span className="label">{jdText.trim().split(/\s+/).filter(Boolean).length || 0} words</span>
           </div>
           <textarea
             className="input-field"
@@ -117,29 +114,27 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           />
         </div>
 
-        {/* Upload Zone Card */}
-        <div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 16, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px' }}>
+        {/* Resume Upload Card */}
+        <div className="resume-card">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--sand-50)', border: '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink-2)' }}>
               <Upload size={18} strokeWidth={1.5} />
             </div>
             <h3 className="serif-heading" style={{ fontSize: '1.25rem' }}>Candidate Resumes</h3>
           </div>
-
           <div
             className={`upload-zone ${dragOver ? 'drag-over' : ''}`}
             onClick={() => fileRef.current.click()}
             onDrop={handleDrop}
             onDragOver={e => { e.preventDefault(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
-            style={{ flex: 1, minHeight: 140 }}
           >
             <input type="file" multiple accept=".pdf,.docx,.json" ref={fileRef} style={{ display: 'none' }} onChange={e => e.target.files.length && setResumes(e.target.files)} />
             {resumes ? (
               <>
                 <FileText size={40} color="var(--violet)" strokeWidth={1.5} />
                 <p style={{ fontWeight: 700, color: 'var(--violet)', fontSize: '1rem' }}>{resumes.length} profiles selected</p>
-                <p style={{ fontSize: '.78rem', color: 'var(--ink-4)' }}>{Array.from(resumes).map(f => f.name).join(' · ')}</p>
+                <p style={{ fontSize: '.78rem', color: 'var(--ink-4)', wordBreak: 'break-all' }}>{Array.from(resumes).map(f => f.name).join(' · ')}</p>
                 <span style={{ fontSize: '.75rem', color: 'var(--violet)', fontWeight: 600, textDecoration: 'underline' }}>Update selection</span>
               </>
             ) : (
@@ -152,40 +147,39 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           </div>
         </div>
 
-        {/* Feature tiles row */}
-        <div className="bento bento-2" style={{ gap: 24 }}>
+        {/* Feature Tiles */}
+        <div className="feature-tiles">
           {[
             { icon: <BarChart3 size={20} strokeWidth={1.5} />, label: 'Neural Scoring', desc: 'Evaluates across 5 distinct dimensions.' },
             { icon: <Zap size={20} strokeWidth={1.5} />, label: 'Real-time Analysis', desc: 'Streaming results with justifications.' },
           ].map((f, i) => (
-            <div key={i} style={{ padding: 24, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px' }}>
+            <div key={i} className="feature-tile">
               <div style={{ color: 'var(--ink-4)', marginBottom: 12 }}>{f.icon}</div>
               <h4 className="serif-heading" style={{ fontSize: '1.1rem', marginBottom: 4 }}>{f.label}</h4>
               <div style={{ fontSize: '.85rem', color: 'var(--ink-4)', lineHeight: 1.5 }}>{f.desc}</div>
             </div>
           ))}
         </div>
-        
-        {/* API Key Override */}
-        <div style={{ background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ color: 'var(--ink-4)' }}><ShieldCheck size={20} strokeWidth={1.5} /></div>
-          <div style={{ flex: 1 }}>
-            <p className="label" style={{ marginBottom: 4, display: 'flex', justifyContent: 'space-between' }}>
+
+        {/* API Key Card */}
+        <div className="api-card">
+          <div style={{ color: 'var(--ink-4)', flexShrink: 0 }}><ShieldCheck size={20} strokeWidth={1.5} /></div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p className="label" style={{ marginBottom: 4, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 4 }}>
               Gemini API Key
-              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--ink-4)' }}>Required for secure, independent processing</span>
+              <span style={{ fontSize: '.7rem', fontWeight: 400, color: 'var(--ink-4)', textTransform: 'none', letterSpacing: 0 }}>Required for secure, independent processing</span>
             </p>
             <div style={{ position: 'relative' }}>
-              <input 
-                type={showKey ? "text" : "password"} 
-                placeholder="Enter your key..." 
-                value={apiKey} 
-                onChange={(e) => setApiKey(e.target.value)} 
-                className="text-input" 
-                style={{ width: '100%', padding: '8px 32px 8px 0', border: 'none', borderBottom: '1px solid var(--sand-200)', borderRadius: 0, height: 'auto', fontSize: '.9rem' }} 
+              <input
+                type={showKey ? 'text' : 'password'}
+                placeholder="Enter your Gemini API key..."
+                value={apiKey}
+                onChange={e => setApiKey(e.target.value)}
+                style={{ width: '100%', padding: '8px 36px 8px 0', border: 'none', borderBottom: '1px solid var(--sand-200)', borderRadius: 0, outline: 'none', fontSize: '.9rem', background: 'transparent', fontFamily: 'inherit', color: 'var(--ink)' }}
               />
-              <button 
+              <button
                 type="button"
-                onClick={() => setShowKey(!showKey)} 
+                onClick={() => setShowKey(!showKey)}
                 style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--ink-4)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
               >
                 {showKey ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
@@ -194,15 +188,16 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
           </div>
         </div>
 
-        {/* Submit button (bottom right) */}
+        {/* Submit Button */}
         <button
-          className="btn btn-primary"
+          className="btn btn-primary submit-btn"
           onClick={() => onEvaluate(jdText, resumes, apiKey)}
           disabled={!jdText.trim() || !resumes || !apiKey.trim() || isLoading}
-          style={{ padding: '16px 32px', fontSize: '1rem', fontWeight: 500, borderRadius: '6px', height: 56, marginTop: 8 }}
+          style={{ marginTop: 8 }}
         >
           {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
         </button>
+
       </div>
     </div>
   );
