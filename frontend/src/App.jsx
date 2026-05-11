@@ -140,6 +140,26 @@ function App() {
             : <ResultsDashboard results={results} onReset={handleReset} />}
         </main>
       </div>
+
+      {/* Mobile navigation bar - only visible on small screens */}
+      <nav className="mobile-nav mobile-only">
+        <button 
+          className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
+          onClick={() => setView('dashboard')}
+        >
+          <LayoutDashboard size={20} strokeWidth={1.5} />
+        </button>
+        <button 
+          className={`nav-btn ${view === 'results' ? 'active' : ''}`} 
+          onClick={() => results && setView('results')}
+          disabled={!results}
+        >
+          <Users size={20} strokeWidth={1.5} />
+        </button>
+        <button className="nav-btn">
+          <User size={20} strokeWidth={1.5} />
+        </button>
+      </nav>
     </div>
   );
 }

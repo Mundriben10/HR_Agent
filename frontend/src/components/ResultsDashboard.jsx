@@ -99,7 +99,7 @@ const Modal = ({ candidate, onClose, onSave }) => {
     <div className="modal-backdrop">
       <div className="modal fade-up">
         {/* Header */}
-        <div style={{ padding:'24px 32px', borderBottom:'1px solid var(--sand-200)', display:'flex', justifyContent:'space-between', alignItems:'center', background: '#F9F8F6' }}>
+        <div className="flex-resp" style={{ padding:'24px 32px', borderBottom:'1px solid var(--sand-200)', background: '#F9F8F6' }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             <div style={{ width:48, height:48, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontSize:'1.25rem', fontFamily: 'Georgia, serif' }}>
               {(candidate.candidate_name||'?')[0].toUpperCase()}
@@ -119,26 +119,19 @@ const Modal = ({ candidate, onClose, onSave }) => {
         </div>
 
         {/* Body */}
-        <div style={{ display:'flex', flex:1, overflow:'hidden', background: '#fff' }}>
+        <div className="flex-resp" style={{ flex: 1, overflow: 'hidden', alignItems: 'stretch', gap: 0 }}>
           {/* Rubric list */}
-          <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <p className="label">Scoring Dimensions</p>
-              <div style={{ display: 'flex', gap: 16, fontSize: '.75rem', color: 'var(--ink-4)' }}>
-                <span><strong style={{color:'var(--rose)'}}>0</strong> – Poor</span>
-                <span><strong style={{color:'var(--amber)'}}>5</strong> – Avg</span>
-                <span><strong style={{color:'var(--emerald)'}}>10</strong> – Excel</span>
-              </div>
-            </div>
-            {Object.entries(DIM).map(([k,m]) => {
-              const orig = candidate[k] || {};
-              const changed = edits[k] !== (orig.score||0);
-              const category = getCategory(edits[k]);
+          <div style={{ flex:1, overflowY:'auto', padding:'20px 24px', display:'flex', flexDirection:'column', gap:16 }} className="stagger">
+            <p className="label">Detailed Score Breakdown</p>
+            {Object.keys(DIM).map(k => {
+              const orig = candidate[k] || { score: 0, justification: '' };
+              const changed = edits[k] !== orig.score;
               const color = getCatColor(edits[k]);
-              
+              const category = getCategory(edits[k]);
+              const m = DIM[k];
               return (
                 <div key={k} className="card" style={{ padding:'16px 20px', borderLeft: changed ? `3px solid var(--violet)` : `1px solid var(--sand-200)` }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+                  <div className="flex-resp" style={{ marginBottom:12 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                       <div style={{ color: 'var(--ink-4)' }}>{m.icon}</div>
                       <span style={{ fontWeight:700, fontSize:'.9rem', color: 'var(--ink-2)' }}>{m.label}</span>
@@ -176,7 +169,7 @@ const Modal = ({ candidate, onClose, onSave }) => {
           </div>
 
           {/* Right panel */}
-          <div style={{ width:280, borderLeft:'1px solid var(--sand-200)', display:'flex', flexDirection:'column' }}>
+          <div className="modal-sidebar" style={{ width:280, borderLeft:'1px solid var(--sand-200)', display:'flex', flexDirection:'column' }}>
             <div style={{ padding:'28px 20px', textAlign:'center', borderBottom:'1px solid var(--sand-200)' }}>
               <Ring score={total} size={110} />
               <p style={{ fontSize:'.8rem', fontWeight:600, color:'var(--ink-3)', marginTop:14 }}>Composite Score</p>
@@ -231,13 +224,13 @@ const ResultsDashboard = ({ results: init, onReset }) => {
   return (
     <div style={{ maxWidth:1100, margin:'0 auto' }}>
       {/* Header row */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:28, paddingBottom: 24, borderBottom: '1px solid var(--sand-200)' }}>
+      <div className="flex-resp" style={{ alignItems:'flex-end', marginBottom:28, paddingBottom: 24, borderBottom: '1px solid var(--sand-200)' }}>
         <div>
           <h1 className="serif-heading" style={{ fontSize:'2.25rem', fontWeight:400, marginBottom:8 }}>Evaluation Results</h1>
           <p style={{ color:'var(--ink-4)', fontSize:'1.05rem', fontFamily: 'Georgia, serif', fontStyle: 'italic', marginBottom: 16 }}>
             AI analyzed {candidates.length} profiles. Shortlist generated based on highest match scores.
           </p>
-          <div style={{ display: 'flex', gap: 24, fontSize: '.85rem', color: 'var(--ink-3)' }}>
+          <div className="flex-resp" style={{ gap: 24, fontSize: '.85rem', color: 'var(--ink-3)', justifyContent: 'flex-start' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--rose)' }}/> <strong>0</strong> – Poor</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--amber)' }}/> <strong>5</strong> – Average</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><span style={{ width:8, height:8, borderRadius:'50%', background:'var(--emerald)' }}/> <strong>10</strong> – Excellent</span>
@@ -254,7 +247,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
       </div>
 
       {/* Stat strip */}
-      <div className="stagger" style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:14, marginBottom:24 }}>
+      <div className="stagger bento bento-2 bento-4-desktop" style={{ gap:14, marginBottom:24 }}>
         {[
           {label:'Total',val:candidates.length,icon: <Users size={18} strokeWidth={1.5} />,color:'var(--ink)'},
           {label:'Shortlisted',val:hired,icon: <CheckCircle size={18} strokeWidth={1.5} />,color:'var(--emerald)'},
@@ -273,7 +266,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
 
       {/* TOP CANDIDATE — big feature card */}
       {top && (
-        <div className="candidate-card fade-up" style={{ marginBottom:32, flexDirection:'row', alignItems:'center', gap:32, padding:'32px 40px', border: '1px solid var(--violet)', boxShadow: '0 4px 24px rgba(74,158,114,.08)', borderRadius: '16px', background: '#fff' }} onClick={()=>setSelected(top)}>
+        <div className="candidate-card fade-up flex-resp" style={{ marginBottom:32, alignItems:'center', gap:32, padding:'32px 40px', border: '1px solid var(--violet)', boxShadow: '0 4px 24px rgba(74,158,114,.08)', borderRadius: '16px', background: '#fff' }} onClick={()=>setSelected(top)}>
           <div style={{ position:'relative', flexShrink:0 }}>
             <Ring score={top.total_score||0} size={110} />
             <div style={{ position:'absolute', top:-6, left:-6, background:'#fbbf24', borderRadius:'50%', width:26, height:26, display:'flex', alignItems:'center', justifyContent:'center', color: '#b45309', boxShadow:'0 2px 8px rgba(0,0,0,.2)' }}>
@@ -281,10 +274,12 @@ const ResultsDashboard = ({ results: init, onReset }) => {
             </div>
           </div>
           <div style={{ flex:1 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+            <div className="flex-resp" style={{ justifyContent: 'flex-start', gap:10, marginBottom:8 }}>
               <h2 className="serif-heading" style={{ fontSize:'1.75rem', fontWeight:400, color:'var(--ink)' }}>{top.candidate_name}</h2>
-              <span className={`tag tag-${rc(top.recommendation)}`}>{top.recommendation}</span>
-              {top.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
+              <div style={{ display: 'flex', gap: 6 }}>
+                <span className={`tag tag-${rc(top.recommendation)}`}>{top.recommendation}</span>
+                {top.is_overridden && <span className="tag" style={{ background:'var(--violet-bg)', color:'var(--violet)' }}>Edited</span>}
+              </div>
             </div>
             <p style={{ fontSize:'.9rem', color:'var(--ink-3)', marginBottom:16, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>Ranked #1 out of {candidates.length} candidates · Highest match score</p>
             
@@ -305,8 +300,8 @@ const ResultsDashboard = ({ results: init, onReset }) => {
         </div>
       )}
 
-      {/* Remaining candidates grid */}
-      <div className="stagger" style={{ display:'flex', flexDirection: 'column', gap:0, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px', overflow: 'hidden' }}>
+      {/* Remaining candidates list */}
+      <div className="stagger" style={{ display:'flex', flexDirection: 'column', gap:0, background: '#fff', border: '1px solid var(--sand-200)', borderRadius: '16px', overflow: 'hidden', marginBottom: 40 }}>
         {rest.map((c, idx) => {
           const i = idx + 1;
           const score = c.total_score || 0;
@@ -314,14 +309,14 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           const isLast = idx === rest.length - 1;
           
           return (
-            <div key={i} className="candidate-list-item fade-up" onClick={()=>setSelected(c)} style={{ padding: '20px 24px', borderBottom: isLast ? 'none' : '1px solid var(--sand-200)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e)=>e.currentTarget.style.background='var(--sand-50)'} onMouseLeave={(e)=>e.currentTarget.style.background='transparent'}>
+            <div key={i} className="candidate-list-item fade-up flex-resp" onClick={()=>setSelected(c)} style={{ padding: '20px 24px', borderBottom: isLast ? 'none' : '1px solid var(--sand-200)', gap: 24, cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e)=>e.currentTarget.style.background='var(--sand-50)'} onMouseLeave={(e)=>e.currentTarget.style.background='transparent'}>
               {/* Left side: Avatar + Info */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0 }}>
                 <div style={{ width:36, height:36, borderRadius:'50%', background:pal[0], color:pal[1], display:'flex', alignItems:'center', justifyContent:'center', fontWeight:400, fontFamily: 'Georgia, serif', fontSize:'1.1rem', flexShrink:0 }}>
                   {(c.candidate_name||'?')[0].toUpperCase()}
                 </div>
                 <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div className="flex-resp" style={{ justifyContent: 'flex-start', gap: 12 }}>
                     <h3 className="serif-heading" style={{ fontSize:'1.1rem', fontWeight:400, color:'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.candidate_name}</h3>
                     <div style={{ display:'flex', gap:6, flexShrink: 0 }}>
                       <span className={`tag tag-${rc(c.recommendation)}`}>{c.recommendation}</span>
@@ -330,7 +325,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
                   </div>
                   {/* Truncated justification for list view */}
                   {c.skills_match?.justification && (
-                    <p style={{ fontSize: '.85rem', color: 'var(--ink-4)', fontFamily: 'Georgia, serif', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' }}>
+                    <p className="mobile-hide" style={{ fontSize: '.85rem', color: 'var(--ink-4)', fontFamily: 'Georgia, serif', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '400px' }}>
                       "{c.skills_match.justification}"
                     </p>
                   )}
@@ -338,7 +333,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
               </div>
 
               {/* Right side: Score & Action */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0, justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ fontSize: '.8rem', color: 'var(--ink-4)', textAlign: 'right' }}>
                     Match<br/><strong style={{ color: sc(score), fontSize: '1.05rem' }}>{score.toFixed(1)}</strong><span style={{ fontSize: '.75rem' }}>/10</span>

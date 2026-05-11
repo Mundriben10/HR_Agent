@@ -153,7 +153,7 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         </div>
 
         {/* Feature tiles row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+        <div className="bento bento-2" style={{ gap: 24 }}>
           {[
             { icon: <BarChart3 size={20} strokeWidth={1.5} />, label: 'Neural Scoring', desc: 'Evaluates across 5 distinct dimensions.' },
             { icon: <Zap size={20} strokeWidth={1.5} />, label: 'Real-time Analysis', desc: 'Streaming results with justifications.' },
