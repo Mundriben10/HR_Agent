@@ -33,7 +33,7 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html,body,#root{height:100%;}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--sand-50);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden;line-height:1.6;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--sand-50);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;}
 h1, h2, h3, .serif-heading { font-family: "Georgia", "Times New Roman", serif; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
 
 /* ── APP SHELL ── */
@@ -228,24 +228,20 @@ h1, h2, h3, .serif-heading { font-family: "Georgia", "Times New Roman", serif; f
   .stack-mobile { flex-direction: column; align-items: stretch; }
   
   .bento-4-desktop { grid-template-columns: 1fr; }
-
-  
-  .app-sidebar { display: none; }
-  .mobile-only { display: flex !important; }
-  
-  .topbar { padding: 0 16px; }
-  .main-view { padding: 20px 16px; }
-  
   .bento-2, .bento-3, .bento-4 { grid-template-columns: 1fr; }
+
+  .app-shell { height: auto; min-height: 100vh; overflow: visible; }
+  .app-sidebar { display: none !important; }
+  .app-content { overflow: visible; }
+  .main-view { padding: 16px 12px 80px 12px; overflow: visible; }
+  .topbar { padding: 0 12px; }
+  
+  .mobile-only { display: flex !important; }
+  .candidate-card { padding: 16px !important; gap: 16px !important; }
+  .card { padding: 16px !important; }
   
   .modal-backdrop { padding: 0; }
-  .modal { 
-    max-height: 100vh; 
-    border-radius: 0; 
-    max-width: 100vw;
-  }
-  
-  .candidate-card { padding: 16px; gap: 12px; }
+  .modal { max-height: 100vh; border-radius: 0; max-width: 100vw; height: 100vh; }
   .modal-sidebar { width: 100% !important; border-left: none !important; border-top: 1px solid var(--sand-200); }
   
   /* Retractable Mobile Menu */
