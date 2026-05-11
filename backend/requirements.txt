@@ -8,3 +8,4 @@ langchain-google-genai
 pymupdf
 python-docx
 python-multipart
+jinja2
