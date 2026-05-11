@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search } from 'lucide-react';
+import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search, Flag, AlertTriangle } from 'lucide-react';
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
 const DIM = {
@@ -66,9 +66,10 @@ const Ring = ({ score, size=90 }) => {
 
 /* ── CANDIDATE MODAL ── */
 const Modal = ({ candidate, onClose, onSave }) => {
+  const [isFlagged, setIsFlagged] = useState(candidate.is_flagged || false);
   const [edits, setEdits] = useState(Object.fromEntries(Object.keys(DIM).map(k=>[k, candidate[k]?.score||0])));
   const [reason, setReason] = useState(candidate.override_reason || '');
-  const hasChanges = Object.keys(DIM).some(k => edits[k] !== (candidate[k]?.score||0));
+  const hasChanges = Object.keys(DIM).some(k => edits[k] !== (candidate[k]?.score||0)) || isFlagged !== (candidate.is_flagged || false);
   const total = Object.entries(W).reduce((s,[k,w])=>s+edits[k]*w,0);
   const pal = AVATAR_PALETTES[(candidate.candidate_name||'').charCodeAt(0)%AVATAR_PALETTES.length];
 
@@ -77,7 +78,8 @@ const Modal = ({ candidate, onClose, onSave }) => {
     const updated = {
       ...candidate,
       ...Object.fromEntries(Object.keys(DIM).map(k=>[k,{...candidate[k],score:edits[k]}])),
-      total_score:total, override_reason:reason, is_overridden:hasChanges||candidate.is_overridden
+      total_score:total, override_reason:reason, is_overridden:Object.keys(DIM).some(k => edits[k] !== (candidate[k]?.score||0))||candidate.is_overridden,
+      is_flagged:isFlagged
     };
     if (hasChanges) {
       const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
@@ -101,10 +103,18 @@ const Modal = ({ candidate, onClose, onSave }) => {
               <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
                 <span className={`tag tag-${rc(candidate.recommendation)}`}>{candidate.recommendation}</span>
                 {candidate.is_overridden && <span className="tag tag-override">Modified</span>}
+                {isFlagged && <span className="tag" style={{ background:'var(--rose-bg)', color:'var(--rose)', display:'flex', alignItems:'center', gap:4 }}><Flag size={10} /> Flagged</span>}
               </div>
             </div>
           </div>
           <div className="modal-header-actions">
+            <button 
+              className="btn btn-ghost btn-sm" 
+              style={{ color: isFlagged ? 'var(--rose)' : 'var(--ink-4)', borderColor: isFlagged ? 'var(--rose)' : 'var(--sand-200)' }}
+              onClick={() => setIsFlagged(!isFlagged)}
+            >
+              <Flag size={14} fill={isFlagged ? 'currentColor' : 'none'} /> {isFlagged ? 'Flagged' : 'Flag for Review'}
+            </button>
             <button className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
             <button className="btn btn-primary btn-sm" onClick={save}>Save Changes</button>
           </div>
@@ -283,6 +293,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
               <h2>{top.candidate_name}</h2>
               <span className={`tag tag-${rc(top.recommendation)}`}>{top.recommendation}</span>
               {top.is_overridden && <span className="tag tag-override">Edited</span>}
+              {top.is_flagged && <span className="tag" style={{ background:'var(--rose-bg)', color:'var(--rose)', display:'flex', alignItems:'center', gap:4 }}><Flag size={10} /> Flagged for Review</span>}
             </div>
             <p style={{ fontSize:'.9rem', color:'var(--ink-3)', marginBottom:16, fontFamily:'Georgia, serif', fontStyle:'italic' }}>
               Ranked #1 out of {candidates.length} candidates · Highest match score
@@ -326,6 +337,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
                       <div style={{ display:'flex', gap:6, flexShrink:0 }}>
                         <span className={`tag tag-${rc(c.recommendation)}`}>{c.recommendation}</span>
                         {c.is_overridden && <span className="tag tag-override">Edited</span>}
+                        {c.is_flagged && <Flag size={14} color="var(--rose)" fill="var(--rose)" style={{ marginLeft:4 }} />}
                       </div>
                     </div>
                     {c.skills_match?.justification && (
