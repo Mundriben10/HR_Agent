@@ -37,7 +37,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--sand-50);color:va
 h1, h2, h3, .serif-heading { font-family: "Georgia", "Times New Roman", serif; font-weight: 400; letter-spacing: -0.02em; color: var(--ink); }
 
 /* ── APP SHELL ── */
-.app-shell{display:flex;height:100vh;width:100vw;overflow:hidden;}
+.app-shell{display:flex;height:100vh;width:100%;overflow-x:hidden;}
 
 /* ── ICON SIDEBAR ── */
 .app-sidebar{
@@ -230,11 +230,14 @@ h1, h2, h3, .serif-heading { font-family: "Georgia", "Times New Roman", serif; f
   .bento-4-desktop { grid-template-columns: 1fr; }
   .bento-2, .bento-3, .bento-4 { grid-template-columns: 1fr; }
 
-  .app-shell { height: auto; min-height: 100vh; overflow: visible; }
+  .app-shell { height: auto; min-height: 100vh; overflow-x: hidden; }
   .app-sidebar { display: none !important; }
-  .app-content { overflow: visible; }
-  .main-view { padding: 16px 12px 80px 12px; overflow: visible; }
+  .app-content { overflow-x: hidden; width: 100%; }
+  .main-view { padding: 16px 12px 80px 12px; overflow-x: hidden; }
   .topbar { padding: 0 12px; }
+  
+  h1 { font-size: 1.75rem !important; }
+  .serif-heading { word-wrap: break-word; }
   
   .mobile-only { display: flex !important; }
   .candidate-card { padding: 16px !important; gap: 16px !important; }
