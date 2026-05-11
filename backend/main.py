@@ -9,7 +9,7 @@ load_dotenv()
 from datetime import datetime
 import json
 
-from parser import extract_text_from_pdf, extract_text_from_docx, extract_text_from_json
+from doc_parser import extract_text_from_pdf, extract_text_from_docx, extract_text_from_json
 from agent_flow import run_agent_flow
 from report_generator import generate_reports
 from pydantic import BaseModel
