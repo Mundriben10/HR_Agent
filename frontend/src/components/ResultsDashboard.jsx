@@ -255,7 +255,29 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           <button className="btn btn-ghost btn-sm" onClick={onReset} style={{ borderRadius:6 }}>
             <RotateCcw size={16} /> Start Over
           </button>
-          <button className="btn btn-primary btn-sm" style={{ borderRadius:6 }}>
+          <button className="btn btn-primary btn-sm" style={{ borderRadius:6 }} onClick={() => {
+            const headers = ['Candidate Name', 'Total Score', 'Recommendation', 'Skills Match', 'Experience', 'Education', 'Projects', 'Communication'];
+            const rows = candidates.map(c => [
+              c.candidate_name,
+              c.total_score.toFixed(1),
+              c.recommendation,
+              c.skills_match?.score || 0,
+              c.experience_relevance?.score || 0,
+              c.education_certs?.score || 0,
+              c.project_portfolio?.score || 0,
+              c.communication_quality?.score || 0
+            ]);
+            const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', `shortlist_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }}>
             Export Shortlist
           </button>
         </div>
