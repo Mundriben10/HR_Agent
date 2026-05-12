@@ -66,9 +66,10 @@ h1, h2, h3, h4, .serif-heading {
   padding: 24px 12px;
   gap: 8px;
   z-index: 100;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
-  height: 100vh;
+  bottom: 0;
   border-right: 1px solid rgba(255,255,255,0.05);
 }
 .sidebar-logo {
@@ -98,7 +99,18 @@ h1, h2, h3, h4, .serif-heading {
 .nav-btn-bottom { margin-top: auto; }
 
 /* ── CONTENT AREA ── */
-.app-content { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; min-width: 0; }
+.app-content { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  overflow-x: hidden; 
+  min-width: 0;
+  margin-left: 220px; /* Match sidebar width */
+}
+
+@media (max-width: 768px) {
+  .app-content { margin-left: 0; }
+}
 .topbar {
   height: 64px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: space-between;
