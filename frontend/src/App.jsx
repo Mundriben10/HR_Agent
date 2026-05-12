@@ -1,33 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UploadSection from './components/UploadSection';
 import ResultsDashboard from './components/ResultsDashboard';
-import { LayoutDashboard, Users, User, AlertCircle, Sparkles } from 'lucide-react';
+import HistoryView from './components/HistoryView';
+import { LayoutDashboard, Users, User, AlertCircle, Sparkles, LogIn, LogOut, History, Trash2 } from 'lucide-react';
+import { supabase } from './supabase';
 
 function App() {
-  const [results, setResults] = useState(null);
-  const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [view, setView] = useState('dashboard');
   const [progress, setProgress] = useState(null);
   const [completedFiles, setCompletedFiles] = useState([]);
-
-  const fetchHistory = async () => {
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-    try {
-      const res = await fetch(`${API_BASE}/api/history`);
-      if (res.ok) {
-        const data = await res.json();
-        setHistory(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch history:", err);
-    }
-  };
+  const [user, setUser] = useState(null);
+  const [results, setResults] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchHistory();
+    supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+    return () => subscription.unsubscribe();
   }, []);
+
+  const login = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+    if (error) alert(error.message);
+  };
+  const logout = async () => { await supabase.auth.signOut(); setView('dashboard'); setResults(null); };
 
   const handleEvaluate = async (jdText, resumes, apiKey = '') => {
     setIsLoading(true); setError(null); setProgress(null); setCompletedFiles([]);
@@ -89,9 +86,36 @@ function App() {
       if (finalResults) {
         console.log('Switching to Results View...');
         setProgress(p => p ? { ...p, step: 'all_done' } : p);
+        
+        // AUTO-SAVE TO SUPABASE if user is logged in
+        if (user) {
+          try {
+            const { data: evalData, error: evalErr } = await supabase
+              .from('evaluations')
+              .insert([{ 
+                user_id: user.id, 
+                jd_text: jdText, 
+                title: jdText.substring(0, 40) + '...' 
+              }])
+              .select();
+            
+            if (evalData && !evalErr) {
+              const candidateInserts = finalResults.map(c => ({
+                evaluation_id: evalData[0].id,
+                name: c.candidate_name,
+                total_score: c.total_score,
+                recommendation: c.recommendation,
+                scores_json: c
+              }));
+              await supabase.from('candidates').insert(candidateInserts);
+            }
+          } catch (dbErr) {
+            console.error('Database save error:', dbErr);
+          }
+        }
+
         await new Promise(r => setTimeout(r, 1000));
         setResults(finalResults); setView('results');
-        fetchHistory(); // Refresh history after new evaluation
       } else {
         console.warn('Evaluation finished but no results were received.');
       }
@@ -118,39 +142,47 @@ function App() {
         <button 
           className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
           onClick={() => setView('dashboard')} 
-          title="New Evaluation"
+          title="Dashboard"
         >
           <LayoutDashboard size={20} />
         </button>
+
+        {user && (
+          <button 
+            className={`nav-btn ${view === 'history' ? 'active' : ''}`} 
+            onClick={() => setView('history')} 
+            title="History"
+          >
+            <History size={20} />
+          </button>
+        )}
+
         <button
           className={`nav-btn ${view === 'results' ? 'active' : ''}`}
           onClick={() => results && setView('results')}
           style={{ opacity: results ? 1 : 0.35, cursor: results ? 'pointer' : 'not-allowed' }}
-          title="Current Evaluation"
+          title="Evaluations"
         >
           <Users size={20} />
           {results && <span className="dot" />}
         </button>
-        <button
-          className={`nav-btn ${view === 'history' ? 'active' : ''}`}
-          onClick={() => { setView('history'); fetchHistory(); }}
-          title="History Archive"
-        >
-          <Sparkles size={20} />
-        </button>
 
-        <button className="nav-btn nav-btn-bottom avatar-btn" title="HR Manager">
-          <User size={16} />
-        </button>
+        {user ? (
+          <button className="nav-btn nav-btn-bottom avatar-btn" title={user.email} onClick={logout}>
+            {user.email[0].toUpperCase()}
+          </button>
+        ) : (
+          <button className="nav-btn nav-btn-bottom" title="Login" onClick={login}>
+            <LogIn size={20} />
+          </button>
+        )}
       </aside>
 
       {/* Content */}
       <div className="app-content">
         <header className="topbar">
           <span className="topbar-title">
-            {view === 'results' ? `Current Results · ${results?.length ?? 0} candidates` : 
-             view === 'history' ? `History Archive · ${history?.length ?? 0} total records` : 
-             'New AI Evaluation'}
+            {view === 'results' ? `Evaluation Results · ${results?.length ?? 0} candidates` : 'New Evaluation'}
           </span>
           <div className="topbar-right">
             {error && (
@@ -158,27 +190,34 @@ function App() {
                 <AlertCircle size={14} /> Backend offline
               </span>
             )}
-            <div className="status-pill">DB Persistent</div>
+            <div className="status-pill">AI Ready</div>
           </div>
         </header>
 
         <main className="main-view">
           {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />}
           {view === 'results' && <ResultsDashboard results={results} onReset={handleReset} />}
-          {view === 'history' && <ResultsDashboard results={history} onReset={handleReset} isHistoryView={true} />}
+          {view === 'history' && <HistoryView onSelect={(res) => { setResults(res.map(c => c.scores_json)); setView('results'); }} />}
         </main>
       </div>
 
-      {/* Mobile navigation bar */}
+      {/* Mobile navigation bar - only visible on small screens */}
       <nav className="mobile-nav mobile-only">
-        <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}>
+        <button 
+          className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
+          onClick={() => setView('dashboard')}
+        >
           <LayoutDashboard size={20} strokeWidth={1.5} />
         </button>
-        <button className={`nav-btn ${view === 'history' ? 'active' : ''}`} onClick={() => { setView('history'); fetchHistory(); }}>
-          <Sparkles size={20} strokeWidth={1.5} />
-        </button>
-        <button className={`nav-btn ${view === 'results' ? 'active' : ''}`} onClick={() => results && setView('results')} disabled={!results}>
+        <button 
+          className={`nav-btn ${view === 'results' ? 'active' : ''}`} 
+          onClick={() => results && setView('results')}
+          disabled={!results}
+        >
           <Users size={20} strokeWidth={1.5} />
+        </button>
+        <button className="nav-btn">
+          <User size={20} strokeWidth={1.5} />
         </button>
       </nav>
     </div>

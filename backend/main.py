@@ -13,22 +13,8 @@ from doc_parser import extract_text_from_pdf, extract_text_from_docx, extract_te
 from agent_flow import run_agent_flow
 from report_generator import generate_reports
 from pydantic import BaseModel
-from database import init_db, SessionLocal, Candidate
-from sqlalchemy.orm import Session
-from fastapi import Depends
-
-# Initialize Database
-init_db()
 
 app = FastAPI(title="AI HR Shortlisting Agent API")
-
-# Dependency to get DB session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,8 +32,7 @@ def read_root():
 async def evaluate_candidates(
     jd_text: str = Form(...),
     resumes: List[UploadFile] = File(...),
-    api_key: str = Form(None),
-    db: Session = Depends(get_db)
+    api_key: str = Form(None)
 ):
     if not jd_text:
         raise HTTPException(status_code=400, detail="Job Description text is required.")
@@ -114,29 +99,6 @@ async def evaluate_candidates(
             evaluation["candidate_name"] = filename
             results.append(evaluation)
 
-            # Persist to Database
-            try:
-                db_candidate = Candidate(
-                    candidate_name=filename,
-                    total_score=evaluation.get("total_score", 0),
-                    recommendation=evaluation.get("recommendation", "Hold"),
-                    skills_match_score=evaluation.get("skills_match", {}).get("score", 0),
-                    skills_match_justification=evaluation.get("skills_match", {}).get("justification", ""),
-                    experience_relevance_score=evaluation.get("experience_relevance", {}).get("score", 0),
-                    experience_relevance_justification=evaluation.get("experience_relevance", {}).get("justification", ""),
-                    education_certs_score=evaluation.get("education_certs", {}).get("score", 0),
-                    education_certs_justification=evaluation.get("education_certs", {}).get("justification", ""),
-                    project_portfolio_score=evaluation.get("project_portfolio", {}).get("score", 0),
-                    project_portfolio_justification=evaluation.get("project_portfolio", {}).get("justification", ""),
-                    communication_quality_score=evaluation.get("communication_quality", {}).get("score", 0),
-                    communication_quality_justification=evaluation.get("communication_quality", {}).get("justification", "")
-                )
-                db.add(db_candidate)
-                db.commit()
-            except Exception as e:
-                print(f"Error saving to DB: {e}")
-                db.rollback()
-
             # Send completed event for this candidate
             done_progress = {
                 "type": "progress",
@@ -163,17 +125,8 @@ class OverrideRequest(BaseModel):
     new_total_score: float
 
 @app.post("/api/override")
-def log_override(request: OverrideRequest, db: Session = Depends(get_db)):
-    """Updates candidate in DB and logs override."""
-    # Update DB
-    db_candidate = db.query(Candidate).filter(Candidate.candidate_name == request.candidate_name).order_by(Candidate.created_at.desc()).first()
-    if db_candidate:
-        db_candidate.total_score = request.new_total_score
-        db_candidate.override_reason = request.override_reason
-        db_candidate.is_overridden = True
-        db.commit()
-
-    # Legacy text logging
+def log_override(request: OverrideRequest):
+    """Physically logs HR overrides to a file."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = {
         "timestamp": timestamp,
@@ -181,44 +134,12 @@ def log_override(request: OverrideRequest, db: Session = Depends(get_db)):
         "new_score": request.new_total_score,
         "reason": request.override_reason
     }
+    
     with open("override_log.txt", "a") as f:
         f.write(json.dumps(log_entry) + "\n")
         
-    return {"status": "success", "message": "Override saved to database."}
-
-@app.get("/api/history")
-def get_history(db: Session = Depends(get_db)):
-    """Fetches all past evaluations from the database."""
-    candidates = db.query(Candidate).order_by(Candidate.created_at.desc()).all()
-    # Format for frontend
-    history = []
-    for c in candidates:
-        history.append({
-            "id": c.id,
-            "candidate_name": c.candidate_name,
-            "total_score": c.total_score,
-            "recommendation": c.recommendation,
-            "is_flagged": c.is_flagged,
-            "is_overridden": c.is_overridden,
-            "override_reason": c.override_reason,
-            "created_at": c.created_at.isoformat(),
-            "skills_match": {"score": c.skills_match_score, "justification": c.skills_match_justification},
-            "experience_relevance": {"score": c.experience_relevance_score, "justification": c.experience_relevance_justification},
-            "education_certs": {"score": c.education_certs_score, "justification": c.education_certs_justification},
-            "project_portfolio": {"score": c.project_portfolio_score, "justification": c.project_portfolio_justification},
-            "communication_quality": {"score": c.communication_quality_score, "justification": c.communication_quality_justification}
-        })
-    return history
-
-@app.delete("/api/candidates/{candidate_id}")
-def delete_candidate(candidate_id: int, db: Session = Depends(get_db)):
-    """Removes a candidate record from the database."""
-    db_candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
-    if not db_candidate:
-        raise HTTPException(status_code=404, detail="Candidate not found")
-    db.delete(db_candidate)
-    db.commit()
-    return {"status": "success", "message": "Candidate deleted successfully"}
+    print(f"\n[HR OVERRIDE LOGGED] {request.candidate_name}: Score changed to {request.new_total_score}. Reason: {request.override_reason}\n")
+    return {"status": "success", "message": "Override logged successfully."}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
