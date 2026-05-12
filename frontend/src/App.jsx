@@ -205,24 +205,47 @@ function App() {
         </main>
       </div>
 
-      {/* Mobile navigation bar - only visible on small screens */}
-      <nav className="mobile-nav mobile-only">
+      {/* MOBILE NAV (BOTTOM) */}
+      <nav className="mobile-nav">
         <button 
           className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
           onClick={() => setView('dashboard')}
         >
-          <LayoutDashboard size={20} strokeWidth={1.5} />
+          <LayoutDashboard size={20} />
+          <span className="nav-label">Evaluate</span>
         </button>
-        <button 
-          className={`nav-btn ${view === 'results' ? 'active' : ''}`} 
-          onClick={() => results && setView('results')}
-          disabled={!results}
-        >
-          <Users size={20} strokeWidth={1.5} />
-        </button>
-        <button className="nav-btn">
-          <User size={20} strokeWidth={1.5} />
-        </button>
+
+        {user && (
+          <button 
+            className={`nav-btn ${view === 'history' ? 'active' : ''}`} 
+            onClick={() => setView('history')}
+          >
+            <History size={20} />
+            <span className="nav-label">Records</span>
+          </button>
+        )}
+
+        {results && (
+          <button 
+            className={`nav-btn ${view === 'results' ? 'active' : ''}`} 
+            onClick={() => setView('results')}
+          >
+            <Users size={20} />
+            <span className="nav-label">Results</span>
+          </button>
+        )}
+
+        {user ? (
+          <button className="nav-btn" onClick={logout}>
+            <LogOut size={20} />
+            <span className="nav-label">Logout</span>
+          </button>
+        ) : (
+          <button className="nav-btn" onClick={login}>
+            <LogIn size={20} />
+            <span className="nav-label">Login</span>
+          </button>
+        )}
       </nav>
     </div>
   );
