@@ -25,6 +25,10 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
   const handleEvaluate = async (jdText, resumes, apiKey = '') => {
     setIsLoading(true); setError(null); setProgress(null); setCompletedFiles([]);
     const formData = new FormData();

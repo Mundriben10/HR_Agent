@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search, Flag, AlertTriangle } from 'lucide-react';
+import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search, Flag, AlertTriangle, Trash2 } from 'lucide-react';
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
 const DIM = {
@@ -307,9 +307,29 @@ const ResultsDashboard = ({ results: init, onReset }) => {
             )}
             <DimBars candidate={top} />
           </div>
-          <button className="btn btn-ghost" style={{ flexShrink:0, gap:'8px', borderRadius:'6px' }}>
-            Inspect <Search size={16} strokeWidth={1.5} />
-          </button>
+          <div style={{ display:'flex', flexDirection:'column', gap:8, flexShrink:0 }}>
+            <button className="btn btn-ghost" style={{ gap:'8px', borderRadius:'6px' }} onClick={(e) => { e.stopPropagation(); setSelected(top); }}>
+              Inspect <Search size={16} strokeWidth={1.5} />
+            </button>
+            {top.id && (
+              <button 
+                className="btn btn-ghost" 
+                style={{ color:'var(--rose)', borderColor:'var(--rose-bg)', borderRadius:'6px' }}
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (window.confirm(`Delete ${top.candidate_name} from database?`)) {
+                    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+                    try {
+                      const res = await fetch(`${API_BASE}/api/candidates/${top.id}`, { method: 'DELETE' });
+                      if (res.ok) window.location.reload();
+                    } catch (err) { alert("Failed to delete"); }
+                  }
+                }}
+              >
+                Delete Record
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -352,7 +372,27 @@ const ResultsDashboard = ({ results: init, onReset }) => {
                     <div style={{ fontSize:'.75rem', color:'var(--ink-4)' }}>Match</div>
                     <div><strong style={{ color:sc(score), fontSize:'1rem' }}>{score.toFixed(1)}</strong><span style={{ fontSize:'.75rem', color:'var(--ink-4)' }}>/10</span></div>
                   </div>
-                  <button className="btn btn-ghost btn-sm" style={{ borderRadius:'6px' }}>Inspect</button>
+                  <div style={{ display:'flex', gap:8 }}>
+                    <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); setSelected(c); }} style={{ borderRadius:'6px' }}>Inspect</button>
+                    {c.id && (
+                      <button 
+                        className="btn btn-ghost btn-sm" 
+                        style={{ color:'var(--rose)', borderColor:'var(--rose-bg)', padding:'7px 10px' }}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (window.confirm(`Delete ${c.candidate_name} from database?`)) {
+                            const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+                            try {
+                              const res = await fetch(`${API_BASE}/api/candidates/${c.id}`, { method: 'DELETE' });
+                              if (res.ok) window.location.reload(); // Refresh to show updated history
+                            } catch (err) { alert("Failed to delete"); }
+                          }
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

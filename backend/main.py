@@ -194,6 +194,7 @@ def get_history(db: Session = Depends(get_db)):
     history = []
     for c in candidates:
         history.append({
+            "id": c.id,
             "candidate_name": c.candidate_name,
             "total_score": c.total_score,
             "recommendation": c.recommendation,
@@ -208,6 +209,16 @@ def get_history(db: Session = Depends(get_db)):
             "communication_quality": {"score": c.communication_quality_score, "justification": c.communication_quality_justification}
         })
     return history
+
+@app.delete("/api/candidates/{candidate_id}")
+def delete_candidate(candidate_id: int, db: Session = Depends(get_db)):
+    """Removes a candidate record from the database."""
+    db_candidate = db.query(Candidate).filter(Candidate.id == candidate_id).first()
+    if not db_candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+    db.delete(db_candidate)
+    db.commit()
+    return {"status": "success", "message": "Candidate deleted successfully"}
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
