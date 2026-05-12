@@ -5,11 +5,25 @@ import { LayoutDashboard, Users, User, AlertCircle, Sparkles } from 'lucide-reac
 
 function App() {
   const [results, setResults] = useState(null);
+  const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [view, setView] = useState('dashboard');
   const [progress, setProgress] = useState(null);
   const [completedFiles, setCompletedFiles] = useState([]);
+
+  const fetchHistory = async () => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    try {
+      const res = await fetch(`${API_BASE}/api/history`);
+      if (res.ok) {
+        const data = await res.json();
+        setHistory(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch history:", err);
+    }
+  };
 
   const handleEvaluate = async (jdText, resumes, apiKey = '') => {
     setIsLoading(true); setError(null); setProgress(null); setCompletedFiles([]);
@@ -73,6 +87,7 @@ function App() {
         setProgress(p => p ? { ...p, step: 'all_done' } : p);
         await new Promise(r => setTimeout(r, 1000));
         setResults(finalResults); setView('results');
+        fetchHistory(); // Refresh history after new evaluation
       } else {
         console.warn('Evaluation finished but no results were received.');
       }
@@ -99,7 +114,7 @@ function App() {
         <button 
           className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
           onClick={() => setView('dashboard')} 
-          title="Dashboard"
+          title="New Evaluation"
         >
           <LayoutDashboard size={20} />
         </button>
@@ -107,10 +122,17 @@ function App() {
           className={`nav-btn ${view === 'results' ? 'active' : ''}`}
           onClick={() => results && setView('results')}
           style={{ opacity: results ? 1 : 0.35, cursor: results ? 'pointer' : 'not-allowed' }}
-          title="Evaluations"
+          title="Current Evaluation"
         >
           <Users size={20} />
           {results && <span className="dot" />}
+        </button>
+        <button
+          className={`nav-btn ${view === 'history' ? 'active' : ''}`}
+          onClick={() => { setView('history'); fetchHistory(); }}
+          title="History Archive"
+        >
+          <Sparkles size={20} />
         </button>
 
         <button className="nav-btn nav-btn-bottom avatar-btn" title="HR Manager">
@@ -122,7 +144,9 @@ function App() {
       <div className="app-content">
         <header className="topbar">
           <span className="topbar-title">
-            {view === 'results' ? `Evaluation Results · ${results?.length ?? 0} candidates` : 'New Evaluation'}
+            {view === 'results' ? `Current Results · ${results?.length ?? 0} candidates` : 
+             view === 'history' ? `History Archive · ${history?.length ?? 0} total records` : 
+             'New AI Evaluation'}
           </span>
           <div className="topbar-right">
             {error && (
@@ -130,34 +154,27 @@ function App() {
                 <AlertCircle size={14} /> Backend offline
               </span>
             )}
-            <div className="status-pill">AI Ready</div>
+            <div className="status-pill">DB Persistent</div>
           </div>
         </header>
 
         <main className="main-view">
-          {view === 'dashboard'
-            ? <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />
-            : <ResultsDashboard results={results} onReset={handleReset} />}
+          {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />}
+          {view === 'results' && <ResultsDashboard results={results} onReset={handleReset} />}
+          {view === 'history' && <ResultsDashboard results={history} onReset={handleReset} isHistoryView={true} />}
         </main>
       </div>
 
-      {/* Mobile navigation bar - only visible on small screens */}
+      {/* Mobile navigation bar */}
       <nav className="mobile-nav mobile-only">
-        <button 
-          className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
-          onClick={() => setView('dashboard')}
-        >
+        <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}>
           <LayoutDashboard size={20} strokeWidth={1.5} />
         </button>
-        <button 
-          className={`nav-btn ${view === 'results' ? 'active' : ''}`} 
-          onClick={() => results && setView('results')}
-          disabled={!results}
-        >
-          <Users size={20} strokeWidth={1.5} />
+        <button className={`nav-btn ${view === 'history' ? 'active' : ''}`} onClick={() => { setView('history'); fetchHistory(); }}>
+          <Sparkles size={20} strokeWidth={1.5} />
         </button>
-        <button className="nav-btn">
-          <User size={20} strokeWidth={1.5} />
+        <button className={`nav-btn ${view === 'results' ? 'active' : ''}`} onClick={() => results && setView('results')} disabled={!results}>
+          <Users size={20} strokeWidth={1.5} />
         </button>
       </nav>
     </div>
