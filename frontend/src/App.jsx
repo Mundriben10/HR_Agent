@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import UploadSection from './components/UploadSection';
 import ResultsDashboard from './components/ResultsDashboard';
 import HistoryView from './components/HistoryView';
+import LoginPage from './components/LoginPage';
 import { LayoutDashboard, Users, User, AlertCircle, Sparkles, LogIn, LogOut, History, Trash2 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -132,73 +133,82 @@ function App() {
 
   return (
     <div className="app-shell">
-      {/* Icon-only sidebar */}
-      <aside className="app-sidebar">
-        <div className="sidebar-logo">
-          <Sparkles size={18} strokeWidth={3} />
-        </div>
-        <div className="sidebar-sep" />
-
-        <button 
-          className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
-          onClick={() => setView('dashboard')} 
-          title="Dashboard"
-        >
-          <LayoutDashboard size={20} />
-        </button>
-
-        {user && (
-          <button 
-            className={`nav-btn ${view === 'history' ? 'active' : ''}`} 
-            onClick={() => setView('history')} 
-            title="History"
-          >
-            <History size={20} />
-          </button>
-        )}
-
-        <button
-          className={`nav-btn ${view === 'results' ? 'active' : ''}`}
-          onClick={() => results && setView('results')}
-          style={{ opacity: results ? 1 : 0.35, cursor: results ? 'pointer' : 'not-allowed' }}
-          title="Evaluations"
-        >
-          <Users size={20} />
-          {results && <span className="dot" />}
-        </button>
-
-        {user ? (
-          <button className="nav-btn nav-btn-bottom avatar-btn" title={user.email} onClick={logout}>
-            {user.email[0].toUpperCase()}
-          </button>
+      <div className="app-container">
+        {!user ? (
+          <LoginPage onLogin={login} />
         ) : (
-          <button className="nav-btn nav-btn-bottom" title="Login" onClick={login}>
-            <LogIn size={20} />
-          </button>
+          <>
+            <aside className="sidebar">
+              <div className="sidebar-logo">
+                <Sparkles size={24} />
+              </div>
+              
+              <button 
+                className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} 
+                onClick={() => setView('dashboard')} 
+                title="Dashboard"
+              >
+                <LayoutDashboard size={20} />
+              </button>
+
+              {user && (
+                <button 
+                  className={`nav-btn ${view === 'history' ? 'active' : ''}`} 
+                  onClick={() => setView('history')} 
+                  title="History"
+                >
+                  <History size={20} />
+                </button>
+              )}
+
+              <button
+                className={`nav-btn ${view === 'results' ? 'active' : ''}`}
+                onClick={() => results && setView('results')}
+                style={{ opacity: results ? 1 : 0.35, cursor: results ? 'pointer' : 'not-allowed' }}
+                title="Evaluations"
+              >
+                <Users size={20} />
+                {results && <span className="dot" />}
+              </button>
+
+              {user ? (
+                <button className="nav-btn nav-btn-bottom avatar-btn" title={user.email} onClick={logout}>
+                  {user.email[0].toUpperCase()}
+                </button>
+              ) : (
+                <button className="nav-btn nav-btn-bottom" title="Login" onClick={login}>
+                  <LogIn size={20} />
+                </button>
+              )}
+            </aside>
+
+            <div className="content-area">
+              <header className="topbar">
+                <div className="topbar-left">
+                  <span className="breadcrumb">Platform</span>
+                  <span className="breadcrumb-sep">/</span>
+                  <span className="breadcrumb-active">
+                    {view === 'dashboard' ? 'New Evaluation' : view === 'results' ? 'Evaluation Results' : 'History'}
+                  </span>
+                </div>
+                <div className="topbar-right">
+                  {error && (
+                    <span style={{ fontSize: '.8rem', color: 'var(--rose)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <AlertCircle size={14} /> Backend offline
+                    </span>
+                  )}
+                  <div className="status-pill">AI Ready</div>
+                </div>
+              </header>
+
+              <main className="main-view">
+                {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />}
+                {view === 'results' && <ResultsDashboard results={results} onReset={handleReset} />}
+                {view === 'history' && <HistoryView onSelect={(res) => { setResults(res.map(c => c.scores_json)); setView('results'); }} />}
+              </main>
+            </div>
+          </>
         )}
-      </aside>
-
-      {/* Content */}
-      <div className="app-content">
-        <header className="topbar">
-          <span className="topbar-title">
-            {view === 'results' ? `Evaluation Results · ${results?.length ?? 0} candidates` : 'New Evaluation'}
-          </span>
-          <div className="topbar-right">
-            {error && (
-              <span style={{ fontSize: '.8rem', color: 'var(--rose)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <AlertCircle size={14} /> Backend offline
-              </span>
-            )}
-            <div className="status-pill">AI Ready</div>
-          </div>
-        </header>
-
-        <main className="main-view">
-          {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />}
-          {view === 'results' && <ResultsDashboard results={results} onReset={handleReset} />}
-          {view === 'history' && <HistoryView onSelect={(res) => { setResults(res.map(c => c.scores_json)); setView('results'); }} />}
-        </main>
       </div>
 
       {/* Mobile navigation bar - only visible on small screens */}
