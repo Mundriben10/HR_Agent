@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search, Flag, AlertTriangle } from 'lucide-react';
+import { Target, Briefcase, GraduationCap, FolderOpen, MessageSquare, Users, CheckCircle, Clock, Trophy, RotateCcw, Search, Flag, AlertTriangle, FileText, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const W = { skills_match:.30, experience_relevance:.25, education_certs:.15, project_portfolio:.20, communication_quality:.10 };
 const DIM = {
@@ -255,7 +257,37 @@ const ResultsDashboard = ({ results: init, onReset }) => {
           <button className="btn btn-ghost btn-sm" onClick={onReset} style={{ borderRadius:6 }}>
             <RotateCcw size={16} /> Start Over
           </button>
-          <button className="btn btn-primary btn-sm" style={{ borderRadius:6 }} onClick={() => {
+          <button className="btn btn-primary btn-sm" style={{ borderRadius:6, background:'var(--ink)', color:'#fff' }} onClick={() => {
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.text('AI HR Shortlist Report', 14, 22);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+            doc.text(`Total Candidates: ${candidates.length}`, 14, 35);
+            
+            const tableData = candidates.map((c, i) => [
+              i + 1,
+              c.candidate_name,
+              c.total_score.toFixed(1),
+              c.recommendation,
+              c.skills_match?.score || 0,
+              c.experience_relevance?.score || 0
+            ]);
+
+            doc.autoTable({
+              startY: 45,
+              head: [['Rank', 'Candidate', 'Score', 'Rec.', 'Skills', 'Exp.']],
+              body: tableData,
+              theme: 'striped',
+              headStyles: { fillColor: [31, 41, 55] }
+            });
+
+            doc.save(`shortlist_${new Date().toISOString().split('T')[0]}.pdf`);
+          }}>
+            <Download size={14} style={{ marginRight:6 }} /> Export PDF
+          </button>
+          <button className="btn btn-ghost btn-sm" style={{ borderRadius:6, border:'1px solid var(--sand-300)' }} onClick={() => {
             const headers = ['Candidate Name', 'Total Score', 'Recommendation', 'Skills Match', 'Experience', 'Education', 'Projects', 'Communication'];
             const rows = candidates.map(c => [
               c.candidate_name,
@@ -278,7 +310,7 @@ const ResultsDashboard = ({ results: init, onReset }) => {
             a.click();
             document.body.removeChild(a);
           }}>
-            Export Shortlist
+            Export CSV
           </button>
         </div>
       </div>
