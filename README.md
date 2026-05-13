@@ -1,44 +1,66 @@
-# AI HR Shortlisting Agent
+# AI HR Shortlisting Platform 🚀
 
-This project is an AI-powered HR Shortlisting Agent that efficiently evaluates candidates by comparing their resumes against a Job Description. 
+A modern, production-grade HR SaaS platform that uses AI to automate candidate shortlisting with high precision, database persistence, and secure multi-user authentication.
 
-## Technology Stack
-- **Frontend**: Built with **React** (Vite) and Vanilla CSS, featuring a bold, dark-themed glassmorphism UI for a professional "enterprise intelligence platform" aesthetic.
-- **Backend**: Built with **FastAPI** (Python), providing a robust, high-performance JSON API.
-- **AI/LLM**: Google Gemini 1.5 Pro (via free tier API) and LangChain for structured evaluation scoring.
-- **PDF Parsing**: PyMuPDF (`fitz`) for accurate text extraction from resumes.
+## 🌟 Key Features
+- **AI-Powered Evaluation**: Uses Google Gemini 1.5 Flash for rapid, accurate resume-to-JD alignment.
+- **Multi-User Auth**: Secure Google OAuth 2.0 integration via Supabase.
+- **Cloud Persistence**: Evaluations and candidate scores are saved to a PostgreSQL database (Supabase).
+- **Human-in-the-Loop (HITL)**: HR managers can manually flag or override AI scores with audit justifications.
+- **Professional Exports**: Download shortlists as professional PDF or CSV reports.
+- **Responsive Design**: Fixed-sidebar desktop layout and mobile-optimized bottom navigation.
 
-## Prerequisites
-1. Python 3.9+
-2. Node.js 18+
-3. A Google Gemini API Key (get one for free from Google AI Studio)
+---
 
-## Setup & Running
+## 🏗️ Agent Architecture
+The platform uses a **Sequential Multi-Stage Agent Flow** built with LangChain.
 
-### 1. Backend (FastAPI)
-```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt # (or install dependencies manually if not present)
-
-# Set your API key
-export GEMINI_API_KEY="your_api_key_here"
-
-# Run the server
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```mermaid
+graph TD
+    A[User Uploads Resumes] --> B[JD Vectorization]
+    B --> C{Agentic Audit Loop}
+    C -->|Extract| D[Structured Profile]
+    C -->|Score| E[Rubric Alignment]
+    E --> F[Human-in-the-Loop Override]
+    F --> G[(Supabase Persistence)]
+    G --> H[PDF/CSV Export]
 ```
-The backend API will be running at `http://localhost:8000`. You can view the docs at `http://localhost:8000/docs`.
 
-### 2. Frontend (React)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-The frontend will be running at `http://localhost:5173`. Open this in your browser to use the platform.
+### Technical Rationale
+- **LLM (Gemini 1.5 Flash)**: Chosen for its **1M+ context window**, allowing for massive batch processing without data loss, and its sub-2s latency.
+- **Framework (LangChain)**: Utilized the ReAct pattern to allow the agent to "Reason" about candidate seniority before "Acting" on scores.
 
-## Features
-- Upload a Job Description and multiple PDF resumes.
-- The backend extracts text and uses LangChain + Gemini to score each candidate on a 5-dimension rubric (Skills Match, Experience Relevance, Education & Certs, Project/Portfolio, Communication Quality).
-- The frontend displays a beautiful, ranked list with visual score bars and expandable justifications.
+---
+
+## 🔒 Security Risk Mitigation
+| Risk | Mitigation Strategy |
+| :--- | :--- |
+| **Prompt Injection** | Strict Pydantic output schemas + backend input sanitization. |
+| **Data Privacy** | Row Level Security (RLS) ensures users only see their own data. |
+| **Key Exposure** | Environment variable masking via Vercel Secrets & `.env`. |
+| **Hallucination** | AI justifies every score with direct quotes + Human-in-the-Loop review. |
+| **Unauth Access** | Mandatory OAuth 2.0 Login for all database operations. |
+
+---
+
+## 🚀 Setup Instructions
+
+### Backend (FastAPI)
+1. Navigate to `/backend`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Set your environment variables in `.env` (see `.env.example`)
+4. Run server: `uvicorn main:app --reload`
+
+### Frontend (React + Vite)
+1. Navigate to `/frontend`
+2. Install dependencies: `npm install`
+3. Set your environment variables in `.env`
+4. Run locally: `npm run dev`
+
+---
+
+## 📁 Repository Structure
+- `/frontend`: React source code, components, and styles.
+- `/backend`: FastAPI server and AI agent logic.
+- `TECHNICAL_LOG.md`: Detailed decision log and technical disclosures.
+- `.env.example`: Template for required API keys.
