@@ -36,8 +36,13 @@ graph TD
     - **Evidence Requirement**: Every score > 5 must include a direct reference or justification found in the text.
     - **Bias Mitigation**: Prompts are structured to ignore personal identifiers (name, gender, etc.) and focus strictly on skill-to-JD alignment.
 
-## 4. Security Mitigations
-- **Row Level Security (RLS)**: Implemented in Supabase to ensure that evaluation data is strictly isolated per HR Manager. A user cannot even guess the UUID of another user's data to access it.
-- **Environment Variable Masking**: Sensitive keys (Supabase URL, Anon Key) are managed via Vercel Secret Management and are never hardcoded in the repository.
-- **Gemini BYOK (Bring Your Own Key)**: To ensure enterprise security, the platform allows users to provide their own API keys, which are handled only in memory during the session and never stored permanently by the backend.
-- **Input Sanitization**: Backend validation ensures only valid PDF/DOCX content is passed to the LLM to prevent prompt injection attacks via resume text.
+## 4. Security Mitigations & Risk Management
+
+| Risk | Description | Mitigation Strategy |
+| :--- | :--- | :--- |
+| **Prompt Injection** | Malicious input manipulating agent behavior. | **Input Sanitization**: Backend filters for system-level keywords. **Structured Output**: Strict Pydantic schemas enforce valid JSON responses, ignoring injected instructions. |
+| **Data Privacy / PII** | Resumes contain sensitive personal info. | **Metadata Masking**: Only essential skill/experience text is sent to the LLM; personal identifiers like Phone/Address are stripped before processing. |
+| **API Key Exposure** | LLM API keys leaked in code/logs. | **Secret Management**: Keys are stored in `.env` (ignored by Git) and managed via Vercel Secrets. **Client-Side Auth**: Use of "Bring Your Own Key" (BYOK) keeps keys in session memory only. |
+| **Hallucination Risk**| LLM generating false scores or justifications. | **Human-in-the-Loop**: HR Managers can flag or override scores. **Confidence Scores**: AI justifies every score with direct quotes from the source text. |
+| **Unauthorised Access**| Anonymous users triggering evaluations. | **OAuth 2.0**: Integration with Google Auth ensures only verified HR personnel can access evaluations. **CORS**: Restricted to specific production domains. |
+| **Email Spoofing** | Sending automated emails from wrong sender. | **Verified Domains**: (If implemented) All communications use strictly verified Sender IDs with SPF/DKIM records. |
