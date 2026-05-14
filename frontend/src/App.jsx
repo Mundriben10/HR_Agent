@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import UploadSection from './components/UploadSection';
 import ResultsDashboard from './components/ResultsDashboard';
 import HistoryView from './components/HistoryView';
-import { LayoutDashboard, Users, User, AlertCircle, Sparkles, LogIn, LogOut, History, Trash2 } from 'lucide-react';
+import LoginPage from './components/LoginPage';
+import { LayoutDashboard, Users, User, AlertCircle, Sparkles, LogIn, LogOut, History, Trash2, Zap } from 'lucide-react';
 import { supabase } from './supabase';
 
 function App() {
@@ -130,12 +131,17 @@ function App() {
 
   const handleReset = () => { setResults(null); setError(null); setProgress(null); setCompletedFiles([]); setView('dashboard'); };
 
+  // LOCK ACCESS: If no user, show the beautiful Login Page first
+  if (!user) {
+    return <LoginPage onLogin={login} />;
+  }
+
   return (
     <div className="app-shell">
-      {/* Icon-only sidebar */}
+      {/* SIDEBAR */}
       <aside className="app-sidebar">
         <div className="sidebar-logo">
-          <Sparkles size={18} strokeWidth={3} />
+          <Zap size={20} fill="currentColor" />
         </div>
         <div className="sidebar-sep" />
 
