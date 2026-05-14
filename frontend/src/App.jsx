@@ -195,12 +195,9 @@ function App() {
             {view === 'results' ? `Evaluation Results · ${results?.length ?? 0} candidates` : 'New Evaluation'}
           </span>
           <div className="topbar-right">
-            {error && (
-              <span style={{ fontSize: '.8rem', color: 'var(--rose)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <AlertCircle size={14} /> Backend offline
-              </span>
-            )}
-            <div className="status-pill">AI Ready</div>
+            <div className="status-pill" style={{ background: backendOnline ? 'var(--emerald-bg)' : 'var(--rose-bg)', color: backendOnline ? 'var(--emerald)' : 'var(--rose)' }}>
+              {backendOnline ? 'System Online' : 'System Offline'}
+            </div>
           </div>
         </header>
 
