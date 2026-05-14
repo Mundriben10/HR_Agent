@@ -14,6 +14,22 @@ function App() {
   const [results, setResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [backendOnline, setBackendOnline] = useState(false);
+
+  useEffect(() => {
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+    const checkBackend = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/`);
+        setBackendOnline(res.ok);
+      } catch {
+        setBackendOnline(false);
+      }
+    };
+    checkBackend();
+    const interval = setInterval(checkBackend, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
