@@ -218,7 +218,7 @@ function App() {
         </header>
 
         <main className="main-view">
-          {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} />}
+          {view === 'dashboard' && <UploadSection onEvaluate={handleEvaluate} isLoading={isLoading} progress={progress} completedFiles={completedFiles} error={error} isOnline={backendOnline} />}
           {view === 'results' && <ResultsDashboard results={results} onReset={handleReset} />}
           {view === 'history' && <HistoryView onSelect={(res) => { setResults(res.map(c => c.scores_json)); setView('results'); }} />}
         </main>

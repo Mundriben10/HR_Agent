@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Cpu, FileText, Upload, Target, Zap, Rocket, CheckCircle, ShieldCheck, BarChart3, Eye, EyeOff } from 'lucide-react';
 
-const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
+const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles, isOnline }) => {
   const [jdText, setJdText] = useState('');
   const [resumes, setResumes] = useState(null);
   const [dragOver, setDragOver] = useState(false);
@@ -192,10 +192,15 @@ const UploadSection = ({ onEvaluate, isLoading, progress, completedFiles }) => {
         <button
           className="btn btn-primary submit-btn"
           onClick={() => onEvaluate(jdText, resumes, apiKey)}
-          disabled={!jdText.trim() || !resumes || !apiKey.trim() || isLoading}
-          style={{ marginTop: 8 }}
+          disabled={!jdText.trim() || !resumes || !apiKey.trim() || isLoading || !isOnline}
+          style={{ marginTop: 8, opacity: isOnline ? 1 : 0.6 }}
         >
-          {isLoading ? <><div className="spinner" />Evaluating...</> : <>Start Evaluation <Rocket size={18} strokeWidth={1.5} /></>}
+          {isLoading ? <><div className="spinner" />Evaluating...</> : (
+            <>
+              {isOnline ? 'Start Evaluation' : 'System Offline'} 
+              <Rocket size={18} strokeWidth={1.5} />
+            </>
+          )}
         </button>
 
       </div>
